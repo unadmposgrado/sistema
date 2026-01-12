@@ -28,8 +28,8 @@
     }
 
     if(email.toLowerCase() === VALID_EMAIL && pwd === VALID_PASSWORD){
-      // credenciales correctas: redirigir a prueba.html
-      window.location.href = 'prueba.html';
+      // credenciales correctas: redirigir a usuario_unadm.html
+      window.location.href = 'usuario_unadm.html';
       return;
     }
 
