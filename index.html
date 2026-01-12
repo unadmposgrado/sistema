@@ -2,33 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Proyecto Trabajo</title>
-  <style>
-    /* Barra de navegación superior */
-    body { margin: 0; }
-    .top-nav {
-      background: #29473f;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-    }
-    .logo {
-      color: #000000;
-      font-weight: 700;
-      font-size: 1.1rem;
-      text-decoration: none;
-    }
-    main { padding-top: 8px; }
-    main img { display: block; margin: 0; max-width: 100%; height: auto; }
-  </style>
+  <title>Sistema de seguimiento al aprendizaje y la permanencia</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="top-nav">
-    <img src="img/Banner SSA.png" height="50" alt="SSA banner">
-  </header>
+  <div id="nav-placeholder"></div>
   <main>
-    <img src="img/unadm-logo.jpeg" width="150" alt="UNADM logo">
+    <h1 class="main-title">Bienvenido al sistema de seguimiento al aprendizaje y la permanencia</h1>
+
+    <div class="carousel" aria-roledescription="carousel">
+      <button class="carousel-control prev" aria-label="Anterior">‹</button>
+      <div class="carousel-track">
+        <div class="carousel-slide"><img src="img/carrusel/estudiantes1.jpg" alt="Imagen 1"></div>
+        <div class="carousel-slide"><img src="img/carrusel/estudiantes2.jpg" alt="Imagen 2"></div>
+        <div class="carousel-slide"><img src="img/carrusel/estudiantes3.jpg" alt="Imagen 3"></div>
+        <div class="carousel-slide"><img src="img/carrusel/estudiantes4.jpg" alt="Imagen 4"></div>
+      </div>
+      <button class="carousel-control next" aria-label="Siguiente">›</button>
+      <div class="carousel-indicators">
+        <button class="indicator active" aria-label="Ir a la imagen 1"></button>
+        <button class="indicator" aria-label="Ir a la imagen 2"></button>
+        <button class="indicator" aria-label="Ir a la imagen 3"></button>
+        <button class="indicator" aria-label="Ir a la imagen 4"></button>
+      </div>
+    </div>
   </main>
+
+  <script src="js/nav.js"></script>
+  <script src="js/carousel.js"></script>
 </body>
 </html>

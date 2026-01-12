@@ -1,0 +1,173 @@
+/* Barra de navegación superior */
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #29473f;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.top-nav img.header-banner { height: 50px; margin-right: 12px; }
+.top-nav .header-title { color: white; font-size: 16px; }
+.nav-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.nav-btn {
+  display: inline-block;
+  background: #333333;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 14px;
+}
+.nav-btn:hover { background: #444; }
+.nav-btn:focus { outline: 2px solid rgba(255,255,255,0.12); }
+.nav-btn.active {
+  background: #ffffff;
+  color: #29473f;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08) inset;
+}
+.logo {
+  display:inline-block;
+  text-decoration: none;
+}
+/* Remove borders on linked images and keep accessible focus style */
+.logo img { border: 0; display: block; }
+.logo:focus { outline: 2px solid rgba(255,255,255,0.12); border-radius:6px; }
+..logo.active { /* No visible border for active logo */ }
+
+/* Profile menu for authenticated users */
+.profile { position: relative; display:inline-block; }
+.profile-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.profile-btn img { width: 100%; height: 100%; object-fit: cover; display:block; }
+.profile-menu { position: absolute; right: 0; top: calc(100% + 8px); min-width: 180px; background: #fff; color: #333; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none; z-index: 1001; }
+.profile-menu a { display: block; padding: 10px 12px; color: inherit; text-decoration: none; font-weight: 600; }
+.profile-menu a:hover { background: #f5f5f5; }
+.profile-menu.show { display: block; }
+.profile-btn:focus { outline: 2px solid rgba(41,71,63,0.12); border-radius: 50%; }
+
+main { padding-top: 68px; }
+main img { display: block; margin: 0; max-width: 100%; height: auto; }
+
+/* Estilo del título principal */
+.main-title { text-align: center; font-family: inherit; }
+
+/* Carrusel de imágenes */
+.carousel {
+  position: relative;
+  margin: 20px auto;
+  max-width: 900px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+}
+.carousel-track { display: flex; transition: transform 0.6s ease; width: 100%; }
+.carousel-slide { min-width: 100%; box-sizing: border-box; }
+.carousel-slide img { width: 100%; height: auto; display: block; }
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.carousel-control.prev { left: 12px; }
+.carousel-control.next { right: 12px; }
+.carousel-control:focus { outline: 2px solid rgba(255,255,255,0.9); }
+.carousel-indicators { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display:flex; gap:8px; }
+.indicator { width:10px; height:10px; border-radius:50%; border: none; background: rgba(255,255,255,0.6); cursor:pointer; padding:0; }
+.indicator.active { background: #fff; box-shadow: 0 0 0 2px rgba(0,0,0,0.12) inset; }
+@media (max-width: 600px) {
+  .carousel { margin: 12px; }
+  .carousel-control { width: 36px; height: 36px; font-size: 18px; }
+}
+
+/* Estilos para formulario de registro */
+.form-container {
+  max-width: 680px;
+  margin: 18px auto 40px;
+  padding: 18px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.form-container form { display: grid; gap: 12px; }
+.form-container label { font-weight: 600; font-size: 0.95rem; }
+.form-container input,
+.form-container select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d7d7;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px; }
+.btn { padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+.btn.primary { background: #29473f; color: #fff; }
+.btn.secondary { background: #f0f0f0; color: #333; }
+.btn:focus { outline: 2px solid rgba(41,71,63,0.2); }
+@media (max-width: 600px) {
+  .form-container { margin: 12px; padding: 14px; }
+  .form-actions { justify-content: stretch; }
+  .form-actions .btn { flex: 1; }
+}
+
+/* Mensaje de error en formularios */
+.error-message {
+  color: #b00020;
+  background: #fff5f6;
+  padding: 10px 12px;
+  border: 1px solid #f0c6c9;
+  border-radius: 6px;
+  font-weight: 600;
+  display: none;
+}
+.error-message.show { display: block; }
+
+/* Password field with toggle */
+.password-field { position: relative; }
+.password-field input { padding-right: 44px; }
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toggle-password svg { width: 20px; height: 20px; display: block; fill: #666; }
+.toggle-password[aria-pressed="true"] svg { fill: #29473f; }
+.toggle-password:focus { outline: 2px solid rgba(41,71,63,0.12); border-radius: 6px; }
+
