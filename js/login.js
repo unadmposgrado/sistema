@@ -16,7 +16,7 @@
     errorBox.classList.remove('show');
   }
 
-  form.addEventListener('submit', function(e){
+  form.addEventListener('submit', async function(e){
     e.preventDefault();
     clearError();
     const email = (emailInput.value || '').trim();
@@ -27,8 +27,21 @@
       return;
     }
 
+    // Si SUPABASE está disponible, usar la autenticación remota
+    if (window.SUPABASE && typeof window.SUPABASE.signIn === 'function') {
+      try {
+        await window.SUPABASE.signIn({ email, password: pwd });
+        window.location.href = 'usuario_unadm.html';
+        return;
+      } catch (err) {
+        console.error(err);
+        showError(err.message || 'Credenciales incorrectas. Intenta de nuevo.');
+        return;
+      }
+    }
+
+    // Fallback a credenciales locales (solo para desarrollo sin Supabase)
     if(email.toLowerCase() === VALID_EMAIL && pwd === VALID_PASSWORD){
-      // credenciales correctas: redirigir a usuario_unadm.html
       window.location.href = 'usuario_unadm.html';
       return;
     }
