@@ -36,6 +36,18 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.startsWith('TU_SUPABASE'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const REGISTRATION_TABLE = 'participant_registrations';
+
+async function saveRegistration(reg) {
+  // Inserta el registro del participante; no debe bloquear el flujo principal
+  const { data, error } = await supabase.from(REGISTRATION_TABLE).insert([reg]);
+  if (error) {
+    console.warn('Supabase: no se pudo guardar participant_registrations', error);
+    return { error };
+  }
+  return { data };
+}
+
 // Exponer helpers globalmente para que otros scripts no-modulares los usen
 window.SUPABASE = {
   client: supabase,
@@ -43,11 +55,11 @@ window.SUPABASE = {
     // Crea usuario en Auth
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
-    // si se creó el user (puede requerir confirmación por email), guardamos perfil
+    // si se creó el user (puede requerir confirmación por email), guardamos/actualizamos perfil
     const userId = data.user ? data.user.id : null;
     if (userId && Object.keys(profile).length) {
-      const { error: insertErr } = await supabase.from(PROFILE_TABLE).insert([{ id: userId, email, ...profile }]);
-      if (insertErr) throw insertErr;
+      const { error: upsertErr } = await supabase.from(PROFILE_TABLE).upsert([{ id: userId, email, ...profile }]);
+      if (upsertErr) throw upsertErr;
     }
     return data;
   },
@@ -67,6 +79,10 @@ window.SUPABASE = {
     const { data, error } = await supabase.from(PROFILE_TABLE).select('*').eq('id', userId).single();
     if (error) throw error;
     return data;
+  },
+
+  async saveRegistration(reg) {
+    return saveRegistration(reg);
   },
 
   getUser() {
@@ -111,10 +127,21 @@ function attachRegisterHandler() {
     try {
       const profile = {
         nombre: nombre?.value || null,
-        edad: edad?.value || null,
+        edad: edad?.value ? parseInt(edad.value, 10) : null,
         institucion: institucion?.value || null,
         grado: grado?.value || null,
       };
+
+      const registration = {
+        email: email.value.trim(),
+        nombre: profile.nombre,
+        edad: profile.edad,
+        institucion: profile.institucion,
+        grado: profile.grado,
+      };
+
+      // Guardar registro en participant_registrations (no bloquear el flujo principal)
+      saveRegistration(registration).catch((rErr) => console.warn('No se pudo guardar registro en participant_registrations', rErr));
 
       await window.SUPABASE.signUp({ email: email.value.trim(), password: password.value, profile });
 
