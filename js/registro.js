@@ -10,6 +10,7 @@ const PENDING_PROFILE_KEY = 'pending_profile_v1';
 
 document.addEventListener('DOMContentLoaded', function () {
   try {
+    console.log('registro.js cargado');
     const form = document.getElementById('registroForm');
     if (!form) return;
 
@@ -26,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function setError(msg) {
       if (!errorEl) return;
       errorEl.textContent = msg || '';
+      // Asegurarse de que el mensaje sea visible (CSS usa .show para display:block)
+      errorEl.classList.toggle('show', Boolean(msg));
     }
 
     function clearError() {
@@ -54,7 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return window.supabaseClient.from('perfiles').upsert([profile]);
     }
 
-    form.addEventListener('submit', async function (e) {
+    let submitHandlerAttached = false;
+
+    async function handleSubmit(e) {
       e.preventDefault();
       clearError();
 
@@ -96,11 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
           edad = n;
         }
 
-        if (!window.supabaseClient || !window.supabaseClient.auth || typeof window.supabaseClient.auth.signUp !== 'function') {
-          setError('Cliente Supabase no disponible. Comprueba la configuración.');
-          return;
-        }
-
+        // Asumimos que window.supabaseClient existe y está inicializado (supabase.js sincronizado)
         setProcessing(true);
 
         let result;
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
               return;
             }
 
-            // Perfíl guardado, redirigir
+            // Perfil guardado, redirigir
             window.location.href = 'dashboard.html';
             return;
           } catch (err) {
@@ -184,7 +185,14 @@ document.addEventListener('DOMContentLoaded', function () {
       } finally {
         setProcessing(false);
       }
-    });
+    }
+
+    form.addEventListener('submit', handleSubmit);
+    submitHandlerAttached = true;
+
+
+
+
   } catch (err) {
     console.error('Inicialización de registro falló:', err);
   }
