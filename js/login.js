@@ -1,52 +1,157 @@
-(function(){
-  const VALID_EMAIL = 'posgradounadm@gmail.com';
-  const VALID_PASSWORD = 'posgrado';
+/* js/login.js
+ * Login usando exclusivamente Supabase Auth v2.
+ * - Espera DOMContentLoaded
+ * - Valida campos
+ * - Usa window.supabaseClient.auth.signInWithPassword()
+ * - Muestra errores en #loginError
+ * - Redirige a dashboard.html en caso de éxito
+ */
 
-  const form = document.getElementById('loginForm');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const errorBox = document.getElementById('loginError');
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    const form = document.getElementById('loginForm');
+    if (!form) return; // salir silenciosamente si no existe
 
-  function showError(msg){
-    errorBox.textContent = msg;
-    errorBox.classList.add('show');
-  }
-  function clearError(){
-    errorBox.textContent = '';
-    errorBox.classList.remove('show');
-  }
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorBox = document.getElementById('loginError');
+    const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
 
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    clearError();
-    const email = (emailInput.value || '').trim();
-    const pwd = (passwordInput.value || '').trim();
-
-    if(!email || !pwd){
-      showError('Por favor completa ambos campos.');
-      return;
+    function setError(msg) {
+      if (!errorBox) return;
+      errorBox.textContent = msg || '';
+      errorBox.classList.toggle('show', Boolean(msg));
     }
 
-    // Si SUPABASE está disponible, usar la autenticación remota
-    if (window.SUPABASE && typeof window.SUPABASE.signIn === 'function') {
+    function clearError() {
+      setError('');
+    }
+
+    function setProcessing(isProcessing) {
       try {
-        await window.SUPABASE.signIn({ email, password: pwd });
-        window.location.href = 'usuario_unadm.html';
-        return;
-      } catch (err) {
-        console.error(err);
-        showError(err.message || 'Credenciales incorrectas. Intenta de nuevo.');
-        return;
+        if (submitBtn) submitBtn.disabled = Boolean(isProcessing);
+        form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
+      } catch (e) {
+        console.error('Error actualizando estado de procesamiento', e);
       }
     }
 
-    // Fallback a credenciales locales (solo para desarrollo sin Supabase)
-    if(email.toLowerCase() === VALID_EMAIL && pwd === VALID_PASSWORD){
-      window.location.href = 'usuario_unadm.html';
-      return;
-    }
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      clearError();
 
-    showError('Credenciales incorrectas. Intenta de nuevo.');
-    passwordInput.focus();
-  });
-})();
+      try {
+        const email = emailInput ? (emailInput.value || '').trim() : '';
+        const password = passwordInput ? (passwordInput.value || '') : '';
+
+        // Validaciones
+        if (!email) {
+          setError('El correo es obligatorio.');
+          return;
+        }
+        // validación básica de formato de email
+        const emailBasicRegex = /^\S+@\S+\.\S+$/;
+        if (!emailBasicRegex.test(email)) {
+          setError('Introduce un correo válido.');
+          return;
+        }
+        if (!password) {
+          setError('La contraseña es obligatoria.');
+          return;
+        }
+
+        // Verificar cliente Supabase
+        if (!window.supabaseClient || !window.supabaseClient.auth || typeof window.supabaseClient.auth.signInWithPassword !== 'function') {
+          setError('Cliente Supabase no disponible. Contacta al administrador.');
+          return;
+        }
+
+        setProcessing(true);
+
+        // Llamada a Supabase Auth v2
+        let result;
+        try {
+          result = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        } catch (err) {
+          console.error('Error llamando a signInWithPassword:', err);
+          setError('Error de conexión con el servicio de autenticación. Intenta más tarde.');
+          return;
+        }
+
+        const error = result && result.error;
+        const data = result && result.data;
+
+        if (error) {
+          // Mensaje de error proveniente de Supabase
+          setError(error.message || 'Credenciales incorrectas.');
+          return;
+        }
+
+        // Autenticación exitosa -> intentar aplicar perfil pendiente (si existe)
+        try {
+          const userId = (data && data.user && data.user.id) || null;
+          const PENDING_PROFILE_KEY = 'pending_profile_v1';
+          let pendingFailed = false;
+
+          if (userId) {
+            try {
+              const pendingRaw = localStorage.getItem(PENDING_PROFILE_KEY);
+              if (pendingRaw) {
+                const pending = JSON.parse(pendingRaw);
+                // verificar que el email coincida antes de aplicar
+                if (pending && pending.email && pending.email.toLowerCase() === email.toLowerCase()) {
+                  const profile = {
+                    id: userId,
+                    email: pending.email,
+                    nombre: pending.nombre || null,
+                    edad: typeof pending.edad === 'number' ? pending.edad : null,
+                    institucion: pending.institucion || null,
+                    grado: pending.grado || null,
+                  };
+
+                  const { error: upsertErr } = await window.supabaseClient.from('perfiles').upsert([profile]);
+                  if (upsertErr) {
+                    console.error('No se pudo guardar el perfil pendiente:', upsertErr);
+                    setError('Autenticado, pero no fue posible guardar tu perfil automáticamente. Puedes intentarlo más tarde.');
+                    pendingFailed = true;
+                  } else {
+                    // limpiar pendiente
+                    localStorage.removeItem(PENDING_PROFILE_KEY);
+                  }
+                }
+              }
+            } catch (err) {
+              console.error('Error procesando perfil pendiente:', err);
+            }
+          }
+
+          // Redirigir al dashboard (no rutas por usuario)
+          if (pendingFailed) {
+            // dar tiempo para que el usuario vea el mensaje
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } catch (err) {
+          console.error('Error al aplicar perfil pendiente:', err);
+          window.location.href = 'dashboard.html';
+        }
+
+        // Redirigir al dashboard (no rutas por usuario)
+        if (typeof pendingFailed !== 'undefined' && pendingFailed) {
+          // dar tiempo para que el usuario vea el mensaje
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (err) {
+        console.error('Error en submit de login:', err);
+        setError('Error inesperado. Intenta de nuevo más tarde.');
+      } finally {
+        setProcessing(false);
+      }
+    });
+  } catch (err) {
+    console.error('Inicialización de login falló:', err);
+  }
+});

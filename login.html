@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>Iniciar sesión - Sistema de seguimiento</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- Configura tus credenciales de Supabase aquí -->
-  <meta name="supabase-url" content="TU_SUPABASE_URL_AQUI">
-  <meta name="supabase-key" content="TU_SUPABASE_ANON_KEY_AQUI">
+  <!-- Las credenciales de Supabase deben configurarse en js/supabase.js (NO en meta tags) -->
 </head>
 <body>
   <div id="nav-placeholder"></div>
@@ -15,7 +13,7 @@
     <h1 class="main-title">Iniciar sesión</h1>
 
     <div class="form-container">
-      <form id="loginForm" action="#" method="post" aria-label="Formulario de inicio de sesión">
+      <form id="loginForm" aria-label="Formulario de inicio de sesión">
         <label for="email">Correo electrónico</label>
         <input id="email" name="email" type="email" required>
 
@@ -39,9 +37,10 @@
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/password-toggle.js"></script>
   <script src="js/nav.js"></script>
-  <script type="module" src="js/supabase.js"></script>
   <script src="js/login.js"></script>
 </body>
 </html>"
