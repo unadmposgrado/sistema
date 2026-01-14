@@ -48,7 +48,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
       if (error) {
-        setError(error.message || 'Credenciales incorrectas.');
+         // Mensajes personalizados
+        let friendlyMessage = 'Credenciales incorrectas.';
+
+        if (error.message?.includes('Email not confirmed')) {
+          friendlyMessage = 'Tu correo aún no ha sido confirmado. Revisa la bandeja de entrada de tu email';
+        } else if (error.message?.includes('Invalid login credentials')) {
+          friendlyMessage = 'Correo o contraseña incorrectos.';
+        } else if (error.message?.includes('User not found')) {
+          friendlyMessage = 'No existe una cuenta con ese correo.';
+        }
+
+        setError(friendlyMessage);
         return;
       }
 
