@@ -1,40 +1,50 @@
-/*
-  js/supabase.js
-  Inicializa el cliente de Supabase de forma SÍNCRONA.
-  Debe incluirse **después** del CDN: <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  y **antes** de cualquier script que use `window.supabaseClient`.
-*/
 (function () {
-  // REEMPLAZA con tus credenciales públicas
+  // Tus credenciales públicas
   const SUPABASE_URL = 'https://vhjuggrimwnceoczwckj.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoanVnZ3JpbXduY2VvY3p3Y2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMzU3NTUsImV4cCI6MjA4MzkxMTc1NX0.LznulBDztffgKXvCeIipLFFepXZLGF2TgZjy64_3lbU';
 
   if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-    console.error('Supabase JS no está cargado o la URL del CDN es incorrecta. Asegúrate de incluir el CDN correctamente antes de este script.');
+    console.error('Supabase JS no está cargado. Revisa el CDN.');
     return;
   }
 
-  // Inicializa el cliente de forma síncrona
+  // Inicializa cliente
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   window.supabaseClient = supabaseClient;
 
-  // Manejar cambios de estado de autenticación (útil al volver desde el link de confirmación)
-  if (supabaseClient && supabaseClient.auth && typeof supabaseClient.auth.onAuthStateChange === 'function') {
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('[supabase] onAuthStateChange', event, session);
-      // Si hay sesión activa y estamos en la raíz, redirigimos al dashboard
-      try {
-        if (session && session.user) {
-          if (location.pathname === '/' || location.pathname.endsWith('index.html')) {
-            window.location.href = 'dashboard.html';
-          }
-        }
-      } catch (e) {
-        console.warn('[supabase] onAuthStateChange handler error', e);
-      }
-    });
-  }
-})();
+  // Detectar sesión activa (cuando usuario confirma correo)
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    console.log('[Supabase] Auth event:', event, session);
 
-  // Nota: por ahora no guardamos datos de perfil en Auth; esos campos adicionales
-  // se almacenarán después en una tabla de perfil desde otro flujo.
+    if (event === 'SIGNED_IN' && session?.user) {
+      const user = session.user;
+
+      // Insertar o actualizar perfil usando datos guardados en localStorage
+      const { data, error } = await supabaseClient
+        .from('perfiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          nombre: localStorage.getItem('pending_nombre') || null,
+          edad: localStorage.getItem('pending_edad') || null,
+          institucion: localStorage.getItem('pending_institucion') || null,
+          grado: localStorage.getItem('pending_grado') || null
+        })
+        .select();
+
+      if (error) {
+        console.error('Error insertando perfil tras confirmación:', error);
+      } else {
+        console.log('Perfil insertado o actualizado:', data);
+        // Limpiar almacenamiento temporal
+        localStorage.removeItem('pending_nombre');
+        localStorage.removeItem('pending_edad');
+        localStorage.removeItem('pending_institucion');
+        localStorage.removeItem('pending_grado');
+      }
+
+      // Redirigir al dashboard
+      window.location.href = 'dashboard.html';
+    }
+  });
+})();

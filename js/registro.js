@@ -1,65 +1,62 @@
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('registro.js cargado');
-
   const form = document.getElementById('registroForm');
   if (!form) return;
 
+  const nombreInput = document.getElementById('nombre');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const passwordConfirmInput = document.getElementById('passwordConfirm');
-  const errorEl = document.getElementById('passwordError');
-  const submitBtn = form.querySelector('button[type="submit"]');
-
-  function setError(msg) {
-    if (!errorEl) return;
-    errorEl.textContent = msg || '';
-    errorEl.classList.toggle('show', Boolean(msg));
-  }
-
-  function setProcessing(isProcessing) {
-    if (submitBtn) submitBtn.disabled = isProcessing;
-    form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
-  }
+  const edadInput = document.getElementById('edad');
+  const institucionInput = document.getElementById('institucion');
+  const gradoInput = document.getElementById('grado');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    setError('');
 
+    const nombre = nombreInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const passwordConfirm = passwordConfirmInput.value;
+    const edad = edadInput.value.trim();
+    const institucion = institucionInput.value.trim();
+    const grado = gradoInput.value.trim();
 
-    if (!email || !password) {
-      setError('Correo y contraseña son obligatorios.');
+    if (!nombre || !email || !password) {
+      alert('Nombre, correo y contraseña son obligatorios.');
       return;
     }
 
     if (password !== passwordConfirm) {
-      setError('Las contraseñas no coinciden.');
+      alert('Las contraseñas no coinciden.');
       return;
     }
 
-    setProcessing(true);
+    // Guardar temporalmente datos extra en localStorage
+    localStorage.setItem('pending_nombre', nombre);
+    localStorage.setItem('pending_edad', edad || '');
+    localStorage.setItem('pending_institucion', institucion || '');
+    localStorage.setItem('pending_grado', grado || '');
 
     try {
-      const { error } = await window.supabaseClient.auth.signUp({
+      const { data, error } = await window.supabaseClient.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          emailRedirectTo: 'https://sistema-gules-psi.vercel.app' // <- Cambia por tu URL de Vercel
+        }
       });
 
       if (error) {
-        setError(error.message);
+        console.error('Error en signUp:', error);
+        alert('Error al registrarse: ' + error.message);
         return;
       }
 
-      alert('Registro exitoso. Revisa tu correo para confirmar tu cuenta.');
-      form.reset();
-
+      console.log('Registro exitoso:', data);
+      alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
     } catch (err) {
-      console.error(err);
-      setError('Error inesperado. Intenta más tarde.');
-    } finally {
-      setProcessing(false);
+      console.error('Error inesperado:', err);
+      alert('Ocurrió un error inesperado.');
     }
   });
 });
