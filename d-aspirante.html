@@ -3,29 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Plataforma Universitaria</title>
+  <title>Dashboard Aspirante</title>
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/d-aspirante.css">
 </head>
+
 <body class="dashboard-page">
   <!-- Barra de navegación -->
   <div id="nav-placeholder" data-logged="true"></div>
 
-  <!-- Contenido principal del dashboard -->
+  <!-- Contenido principal -->
   <main class="dashboard">
     <div class="container">
-      <h1 class="student-name">Bienvenido, usuario</h1>
 
+      <!-- Bienvenida -->
+      <h1 class="student-name" id="welcomeName">Bienvenido</h1>
+
+      <!-- Información básica -->
       <div class="info-section">
-        <div class="label">Programa educativo</div>
-        <div class="value program">Por asignar</div>
+        <div class="label">Nivel de estudios</div>
+        <div class="value" id="studyLevel">Por definir</div>
       </div>
 
-      <div class="info-section">
-        <div class="label">Tutor asignado</div>
-        <div class="value tutor">Por asignar</div>
-      </div>
-      </div>
+      <!-- Archivos subidos -->
+      <section class="files-section">
+        <h2>Documentos enviados</h2>
+
+        <div id="uploadedFiles" class="files-list empty">
+          <p>Aún no has subido ningún archivo.</p>
+        </div>
+      </section>
+
+      <!-- Subida de documentos -->
+      <section class="upload-section">
+        <h2>Subir documentos</h2>
+
+        <div class="upload-grid">
+
+          <!-- Carta de motivos -->
+          <div class="upload-card" data-type="carta">
+            <h3>Carta de exposición de motivos</h3>
+            <input type="file" accept=".pdf,.doc,.docx">
+            <div class="actions">
+              <button class="btn-primary upload-btn">Cargar</button>
+              <button class="btn-secondary cancel-btn">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- CV -->
+          <div class="upload-card" data-type="cv">
+            <h3>Currículum Vitae (CV)</h3>
+            <input type="file" accept=".pdf,.doc,.docx">
+            <div class="actions">
+              <button class="btn-primary upload-btn">Cargar</button>
+              <button class="btn-secondary cancel-btn">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- Anteproyecto -->
+          <div class="upload-card" data-type="anteproyecto">
+            <h3>Anteproyecto</h3>
+            <input type="file" accept=".pdf,.doc,.docx">
+            <div class="actions">
+              <button class="btn-primary upload-btn">Cargar</button>
+              <button class="btn-secondary cancel-btn">Cancelar</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -34,5 +83,6 @@
   <script src="js/supabase.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/d-aspirante.js"></script>
 </body>
 </html>
