@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (error) throw error;
 
-      alert('Registro exitoso. ¡Bienvenido! Por favor inicia sesión.');
+      alert('Registro exitoso. ¡Bienvenido! Por favor revisa tu correo, y después de confirmarlo inicia sesión.');
       form.reset();
 
       // Redirigir a login
