@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   const form = document.getElementById('loginForm');
   if (!form) return;
 
@@ -13,13 +13,22 @@ document.addEventListener('DOMContentLoaded', function () {
     errorBox.classList.toggle('show', Boolean(msg));
   }
 
-  function clearError() {
-    setError('');
-  }
+  function clearError() { setError(''); }
 
   function setProcessing(isProcessing) {
     if (submitBtn) submitBtn.disabled = Boolean(isProcessing);
     form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
+  }
+
+  // Redirigir solo si estamos en login.html y ya hay sesión activa
+  try {
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    if (session?.user) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+  } catch(err) {
+    console.error('Error verificando sesión existente:', err);
   }
 
   form.addEventListener('submit', async function (e) {
@@ -30,22 +39,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const email = (emailInput.value || '').trim();
     const password = passwordInput.value || '';
 
-    if (!email) {
-      setError('El correo es obligatorio.');
-      setProcessing(false);
-      return;
-    }
-    const emailBasicRegex = /^\S+@\S+\.\S+$/;
-    if (!emailBasicRegex.test(email)) {
-      setError('Introduce un correo válido.');
-      setProcessing(false);
-      return;
-    }
-    if (!password) {
-      setError('La contraseña es obligatoria.');
-      setProcessing(false);
-      return;
-    }
+    if (!email) { setError('El correo es obligatorio.'); setProcessing(false); return; }
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) { setError('Introduce un correo válido.'); setProcessing(false); return; }
+    if (!password) { setError('La contraseña es obligatoria.'); setProcessing(false); return; }
 
     try {
       const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
@@ -54,9 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         setError(error.message || 'Credenciales incorrectas.');
         return;
       }
-
-      // Guardar sesión o usuario para usar en dashboard
-      window.localStorage.setItem('user', JSON.stringify(data.user));
 
       // Redirigir al dashboard
       window.location.href = 'dashboard.html';
