@@ -31,32 +31,44 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Guardar temporalmente datos extra en localStorage
-    localStorage.setItem('pending_nombre', nombre);
-    localStorage.setItem('pending_edad', edad || '');
-    localStorage.setItem('pending_institucion', institucion || '');
-    localStorage.setItem('pending_grado', grado || '');
-
     try {
-      const { data, error } = await window.supabaseClient.auth.signUp({
+      // 1️⃣ Registrar en Auth
+      const { data: signUpData, error: signUpError } = await window.supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // <- Cambia por tu URL de Vercel
+          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // <- tu URL real
         }
       });
 
-      if (error) {
-        console.error('Error en signUp:', error);
-        alert('Error al registrarse: ' + error.message);
-        return;
+      if (signUpError) throw signUpError;
+      console.log('Usuario creado en Auth:', signUpData);
+
+      // 2️⃣ Insertar en tabla perfiles usando el ID del usuario
+      if (signUpData.user) {
+        const { data: perfilData, error: perfilError } = await window.supabaseClient
+          .from('perfiles')
+          .insert([{
+            id: signUpData.user.id, // ID vinculado al Auth
+            email,
+            nombre,
+            edad: edad || null,
+            institucion: institucion || null,
+            grado: grado || null
+          }]);
+
+        if (perfilError) throw perfilError;
+        console.log('Perfil insertado:', perfilData);
       }
 
-      console.log('Registro exitoso:', data);
       alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
+
+      // Opcional: limpiar el formulario
+      form.reset();
+
     } catch (err) {
-      console.error('Error inesperado:', err);
-      alert('Ocurrió un error inesperado.');
+      console.error('Error en registro:', err);
+      alert('Ocurrió un error: ' + err.message);
     }
   });
 });
