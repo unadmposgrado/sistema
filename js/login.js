@@ -13,24 +13,31 @@ document.addEventListener('DOMContentLoaded', async function () {
     errorBox.classList.toggle('show', Boolean(msg));
   }
 
-  function clearError() { setError(''); }
+  function clearError() {
+    setError('');
+  }
 
   function setProcessing(isProcessing) {
     if (submitBtn) submitBtn.disabled = Boolean(isProcessing);
     form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
   }
 
-  // Redirigir solo si estamos en login.html y ya hay sesión activa
+  /* =========================================================
+     Si ya hay sesión activa → redirigir según rol
+  ========================================================= */
   try {
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     if (session?.user) {
-      window.location.href = 'dashboard.html';
+      await redirectByRole(session.user.id);
       return;
     }
-  } catch(err) {
+  } catch (err) {
     console.error('Error verificando sesión existente:', err);
   }
 
+  /* =========================================================
+     Submit del formulario
+  ========================================================= */
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     clearError();
@@ -39,20 +46,35 @@ document.addEventListener('DOMContentLoaded', async function () {
     const email = (emailInput.value || '').trim();
     const password = passwordInput.value || '';
 
-    if (!email) { setError('El correo es obligatorio.'); setProcessing(false); return; }
+    if (!email) {
+      setError('El correo es obligatorio.');
+      setProcessing(false);
+      return;
+    }
+
     const emailRegex = /^\S+@\S+\.\S+$/;
-    if (!emailRegex.test(email)) { setError('Introduce un correo válido.'); setProcessing(false); return; }
-    if (!password) { setError('La contraseña es obligatoria.'); setProcessing(false); return; }
+    if (!emailRegex.test(email)) {
+      setError('Introduce un correo válido.');
+      setProcessing(false);
+      return;
+    }
+
+    if (!password) {
+      setError('La contraseña es obligatoria.');
+      setProcessing(false);
+      return;
+    }
 
     try {
-      const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+      const { data, error } =
+        await window.supabaseClient.auth.signInWithPassword({ email, password });
 
       if (error) {
-         // Mensajes personalizados
+        // Mensajes personalizados (los tuyos, intactos)
         let friendlyMessage = 'Credenciales incorrectas.';
 
         if (error.message?.includes('Email not confirmed')) {
-          friendlyMessage = 'Tu correo aún no ha sido confirmado. Revisa la bandeja de entrada de tu email';
+          friendlyMessage = 'Tu correo aún no ha sido confirmado. Revisa tu bandeja de entrada.';
         } else if (error.message?.includes('Invalid login credentials')) {
           friendlyMessage = 'Correo o contraseña incorrectos.';
         } else if (error.message?.includes('User not found')) {
@@ -63,8 +85,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
       }
 
-      // Redirigir al dashboard
-      window.location.href = 'dashboard.html';
+      // ✅ Login correcto → redirigir por rol
+      await redirectByRole(data.user.id);
 
     } catch (err) {
       console.error('Error en login:', err);
@@ -73,4 +95,36 @@ document.addEventListener('DOMContentLoaded', async function () {
       setProcessing(false);
     }
   });
+
+  /* =========================================================
+     Redirección centralizada por rol
+  ========================================================= */
+  async function redirectByRole(userId) {
+    try {
+      const { data: perfil, error } = await window.supabaseClient
+        .from('perfiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      if (error || !perfil) {
+        console.error('Error obteniendo rol:', error);
+        setError('No se pudo determinar el tipo de usuario.');
+        return;
+      }
+
+      if (perfil.role === 'aspirante') {
+        window.location.href = 'd-aspirante.html';
+      } else if (perfil.role === 'estudiante') {
+        window.location.href = 'dashboard.html';
+      } else {
+        // Fallback seguro
+        window.location.href = 'dashboard.html';
+      }
+
+    } catch (err) {
+      console.error('Error redirigiendo por rol:', err);
+      setError('Error al redirigir al dashboard.');
+    }
+  }
 });
