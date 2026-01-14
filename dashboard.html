@@ -2,74 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Sistema de seguimiento al aprendizaje y la permanencia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Plataforma Universitaria</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body class="dashboard-page">
+  <!-- Barra de navegación -->
   <div id="nav-placeholder" data-logged="true"></div>
-  <div class="dashboard">
-        <div class="header">
-            <div class="student-name">Bienvenido<br>Daniel Hernández Ortiz</div>
-            <div class="program">Programa educativo: Enseñanza de las matemáticas</div>
-            <div class="tutor">Tutor: Zenón Hernández Hernández</div>
-        </div>
 
-        <div class="progress-section">
-            <div class="progress-label">
-                <span>Progreso General</span>
-                <span>73%</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar"></div>
-            </div>
-        </div>
+  <!-- Contenido principal del dashboard -->
+  <main class="dashboard">
+    <div class="container">
+      <h1>Bienvenido, Daniel Hernández Ortiz</h1>
 
-        <div class="courses-section">
-            <div class="section-title">Cursos Completados</div>
-            <ul class="course-list">
-                <li class="course-item completed">
-                    <div class="course-icon">✓</div>
-                    <div class="course-name">Curso de aula virtual de moodle</div>
-                </li>
-                <li class="course-item completed">
-                    <div class="course-icon">✓</div>
-                    <div class="course-name">Curso de Mediación didáctica</div>
-                </li>
-                <li class="course-item completed">
-                    <div class="course-icon">✓</div>
-                    <div class="course-name">Seminario de investigación</div>
-                </li>
-            </ul>
-        </div>
+      <div class="info-section">
+        <div class="label">Programa educativo</div>
+        <div class="value">Enseñanza de las matemáticas</div>
+      </div>
 
-        <div class="courses-section">
-            <div class="section-title">Cursos en Proceso</div>
-            <ul class="course-list">
-                <li class="course-item in-progress">
-                    <div class="course-icon">⟳</div>
-                    <div class="course-name">Finanzas públicas</div>
-                </li>
-                <li class="course-item in-progress">
-                    <div class="course-icon">⟳</div>
-                    <div class="course-name">Matemáticas</div>
-                </li>
-                <li class="course-item in-progress">
-                    <div class="course-icon">⟳</div>
-                    <div class="course-name">Historia</div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="stats-section">
-            <div class="stats-number">14</div>
-            <div class="stats-label">Archivos Subidos</div>
+      <div class="info-section">
+        <div class="label">Avance</div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 73%;"></div>
         </div>
       </div>
-    </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
-<script src="js/nav.js"></script>
-<script src="js/dashboard.js"></script>
+
+      <div class="courses-section">
+        <div class="course-category">
+          <div class="category-title">En progreso</div>
+          <ul class="course-list">
+            <li class="course-item">Matemáticas básicas</li>
+            <li class="course-item">Historia</li>
+            <li class="course-item">Biología</li>
+          </ul>
+        </div>
+
+        <div class="course-category">
+          <div class="category-title">Concluidos</div>
+          <ul class="course-list">
+            <li class="course-item completed">Seminario de investigación</li>
+            <li class="course-item completed">Mediación didáctica</li>
+            <li class="course-item completed">Curso de aula virtual de moodle</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>
