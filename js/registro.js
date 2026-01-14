@@ -106,7 +106,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let result;
         try {
-          result = await window.supabaseClient.auth.signUp({ email, password });
+          // Determinar URL de redirección: en desarrollo usamos el origin local, en producción forzamos la URL de Vercel
+          const redirectUrl = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? `${location.origin}/` : 'https://sistema-gules-psi.vercel.app/';
+          result = await window.supabaseClient.auth.signUp({ email, password }, { emailRedirectTo: redirectUrl });
         } catch (err) {
           console.error('Error en signUp:', err);
           setError('Ocurrió un error al comunicarse con el servicio de autenticación. Intenta más tarde.');
@@ -177,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // No hay userId: informar y guardar pendiente por email
         savePendingProfile({ id: null, email, nombre, edad, institucion, grado });
-        setError('Registro recibido. Revisa tu correo para confirmar la cuenta. Tus datos se guardarán cuando inicies sesión.');
+        setError('Registro recibido. Revisa tu correo para confirmar la cuenta. El enlace de confirmación redirigirá a: ' + redirectUrl + ' Tus datos se guardarán cuando inicies sesión.');
 
       } catch (err) {
         console.error(err);
