@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const nombreInput = document.getElementById('nombre');
   const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password'); // Debes agregar este input
   const edadInput = document.getElementById('edad');
   const institucionInput = document.getElementById('institucion');
   const gradoInput = document.getElementById('grado');
@@ -13,20 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nombre = nombreInput.value.trim();
     const email = emailInput.value.trim();
+    const password = passwordInput.value;
     const edad = parseInt(edadInput.value) || null;
     const institucion = institucionInput.value.trim() || null;
     const grado = gradoInput.value.trim() || null;
 
-    if (!nombre || !email) {
-      alert('Nombre y correo son obligatorios.');
+    if (!nombre || !email || !password) {
+      alert('Nombre, correo y contraseña son obligatorios.');
       return;
     }
 
     try {
+      // 1️⃣ Crear usuario en Authentication
+      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (authError) throw authError;
+
+      // 2️⃣ Guardar datos extra en tabla perfiles usando el id de Auth
       const { data, error } = await supabaseClient
         .from('perfiles')
         .insert([
           {
+            id: authData.user.id,
             nombre,
             email,
             edad,
@@ -38,15 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (error) throw error;
 
-      alert('Registro exitoso. ¡Bienvenido!');
+      alert('Registro exitoso. ¡Bienvenido! Por favor inicia sesión.');
       form.reset();
 
-      // Opcional: redirigir al dashboard o página de bienvenida
-      window.location.href = 'dashboard.html';
+      // Redirigir a login
+      window.location.href = 'login.html';
 
     } catch (err) {
-      console.error('Error al insertar perfil:', err);
-      alert('Ocurrió un error al registrar tus datos.');
+      console.error('Error al registrar usuario:', err);
+      alert(err.message || 'Ocurrió un error al registrar tus datos.');
     }
   });
 });
