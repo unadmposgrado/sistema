@@ -14,36 +14,37 @@
   <!-- Contenido principal del dashboard -->
   <main class="dashboard">
     <div class="container">
-      <h1>Bienvenido, Daniel Hernández Ortiz</h1>
+      <h1 class="student-name">Bienvenido, usuario</h1>
 
       <div class="info-section">
         <div class="label">Programa educativo</div>
-        <div class="value">Enseñanza de las matemáticas</div>
+        <div class="value program">Por asignar</div>
+      </div>
+
+      <div class="info-section">
+        <div class="label">Tutor asignado</div>
+        <div class="value tutor">Por asignar</div>
       </div>
 
       <div class="info-section">
         <div class="label">Avance</div>
         <div class="progress-container">
-          <div class="progress-bar" style="width: 73%;"></div>
+          <div class="progress-bar" style="width: 0%;"></div>
         </div>
       </div>
 
       <div class="courses-section">
         <div class="course-category">
           <div class="category-title">En progreso</div>
-          <ul class="course-list">
-            <li class="course-item">Matemáticas básicas</li>
-            <li class="course-item">Historia</li>
-            <li class="course-item">Biología</li>
+          <ul class="course-list in-progress">
+            <!-- Items dinámicos -->
           </ul>
         </div>
 
         <div class="course-category">
           <div class="category-title">Concluidos</div>
-          <ul class="course-list">
-            <li class="course-item completed">Seminario de investigación</li>
-            <li class="course-item completed">Mediación didáctica</li>
-            <li class="course-item completed">Curso de aula virtual de moodle</li>
+          <ul class="course-list completed">
+            <!-- Items dinámicos -->
           </ul>
         </div>
       </div>
