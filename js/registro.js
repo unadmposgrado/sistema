@@ -38,23 +38,57 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('pending_grado', grado || '');
 
     try {
-      // Registrar usuario en Auth
-      const { data, error } = await window.supabaseClient.auth.signUp({
+      // Registrar usuario en Auth y guardar user_metadata como respaldo
+      const signUpResult = await window.supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // tu URL real
+          emailRedirectTo: 'https://sistema-gules-psi.vercel.app/dashboard.html', // tu URL real
+          data: { nombre, edad: edad || null, institucion: institucion || null, grado: grado || null }
         }
       });
 
-      if (error) {
-        console.error('Error en signUp:', error);
-        alert('Error al registrarse: ' + error.message);
+      if (signUpResult.error) {
+        console.error('Error en signUp:', signUpResult.error);
+        alert('Error al registrarse: ' + signUpResult.error.message);
         return;
       }
 
-      console.log('Registro exitoso:', data);
+      const user = signUpResult.data?.user;
+      console.log('Registro exitoso:', signUpResult.data);
       alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
+
+      // Intentar insertar perfil en la tabla 'perfiles' inmediatamente, antes de la confirmación
+      if (user && user.id) {
+        try {
+          const edadInt = edad ? parseInt(edad, 10) : null;
+          const { data: perfilData, error: perfilError } = await window.supabaseClient
+            .from('perfiles')
+            .upsert({
+              id: user.id,
+              email: user.email,
+              nombre,
+              edad: edadInt,
+              institucion: institucion || null,
+              grado: grado || null
+            })
+            .select();
+
+          if (perfilError) {
+            console.error('Error al insertar perfil antes de confirmar:', perfilError);
+            // dejamos los datos en localStorage como respaldo
+          } else {
+            console.log('Perfil insertado o actualizado precocemente:', perfilData);
+            // limpiar datos pendientes
+            localStorage.removeItem('pending_nombre');
+            localStorage.removeItem('pending_edad');
+            localStorage.removeItem('pending_institucion');
+            localStorage.removeItem('pending_grado');
+          }
+        } catch (err) {
+          console.error('Error inesperado al insertar perfil:', err);
+        }
+      }
 
       // Limpiar formulario
       form.reset();
