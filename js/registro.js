@@ -4,10 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const nombreInput = document.getElementById('nombre');
   const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password'); // Debes agregar este input
+  const passwordInput = document.getElementById('password');
   const edadInput = document.getElementById('edad');
   const institucionInput = document.getElementById('institucion');
   const gradoInput = document.getElementById('grado');
+  const roleInput = document.getElementById('role');
+  const matriculaContainer = document.getElementById('matricula-container');
+  const matriculaInput = document.getElementById('matricula');
+
+  // Mostrar/ocultar matrícula según rol
+  roleInput.addEventListener('change', () => {
+    if (roleInput.value === 'estudiante') {
+      matriculaContainer.style.display = 'block';
+      matriculaInput.required = true;
+    } else {
+      matriculaContainer.style.display = 'none';
+      matriculaInput.required = false;
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -18,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const edad = parseInt(edadInput.value) || null;
     const institucion = institucionInput.value.trim() || null;
     const grado = gradoInput.value.trim() || null;
+    const role = roleInput.value || 'aspirante';
+    const matricula = role === 'estudiante' ? matriculaInput.value.trim() : null;
 
     if (!nombre || !email || !password) {
       alert('Nombre, correo y contraseña son obligatorios.');
@@ -29,32 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data: authData, error: authError } = await supabaseClient.auth.signUp({
         email,
         password,
-  options: {
-    emailRedirectTo: null,
-    shouldCreateUser: true
-  }
+        options: { shouldCreateUser: true }
       });
-
       if (authError) throw authError;
 
-      // 2️⃣ Guardar datos extra en tabla perfiles usando el id de Auth
+      // 2️⃣ Guardar datos extra en tabla perfiles
       const { data, error } = await supabaseClient
         .from('perfiles')
-        .upsert([
-          {
-            id: authData.user.id,
-            nombre,
-            email,
-            edad,
-            institucion,
-            grado
-          }
-        ])
+        .upsert([{
+          id: authData.user.id,
+          nombre,
+          email,
+          edad,
+          institucion,
+          grado,
+          role,
+          matricula
+        }])
         .select();
-
       if (error) throw error;
 
-      alert('Registro exitoso. ¡Bienvenido! Por favor revisa tu correo, y después de confirmarlo inicia sesión.');
+      alert('Registro exitoso. ¡Bienvenido! Por favor revisa tu correo y después inicia sesión.');
       form.reset();
 
       // Redirigir a login

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Plataforma Universitaria</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-page">
+  <!-- Barra de navegación -->
+  <div id="nav-placeholder" data-logged="true"></div>
+
+  <!-- Contenido principal del dashboard -->
+  <main class="dashboard">
+    <div class="container">
+      <h1 class="student-name">Bienvenido, usuario</h1>
+
+      <div class="info-section">
+        <div class="label">Programa educativo</div>
+        <div class="value program">Por asignar</div>
+      </div>
+
+      <div class="info-section">
+        <div class="label">Tutor asignado</div>
+        <div class="value tutor">Por asignar</div>
+      </div>
+
+      <div class="info-section">
+        <div class="label">Avance</div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="courses-section">
+        <div class="course-category">
+          <div class="category-title">En progreso</div>
+          <ul class="course-list in-progress">
+            <!-- Items dinámicos -->
+          </ul>
+        </div>
+
+        <div class="course-category">
+          <div class="category-title">Concluidos</div>
+          <ul class="course-list completed">
+            <!-- Items dinámicos -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
