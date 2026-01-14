@@ -1,63 +1,106 @@
-(function(){
+(function () {
   const placeholder = document.getElementById('nav-placeholder');
-  if(!placeholder) return;
+  if (!placeholder) return;
 
   const useLogged = placeholder.dataset.logged === 'true';
   const fileToLoad = useLogged ? 'nav-logged.html' : 'nav.html';
 
   fetch(fileToLoad)
     .then(res => {
-      if(!res.ok) throw new Error('No se pudo cargar ' + fileToLoad);
+      if (!res.ok) throw new Error('No se pudo cargar ' + fileToLoad);
       return res.text();
     })
-    .then(html => {
+    .then(async html => {
       placeholder.innerHTML = html;
 
-      // Marcar enlace activo (por nombre de fichero)
+      // Marcar enlace activo
       const current = (location.pathname.split('/').pop() || 'index.html');
       const links = placeholder.querySelectorAll('a[href]');
       links.forEach(a => {
-        const href = a.getAttribute('href') || '';
-        const hrefFile = href.split('/').pop();
-        if(hrefFile === current) a.classList.add('active');
+        const hrefFile = a.getAttribute('href')?.split('/').pop();
+        if (hrefFile === current) a.classList.add('active');
       });
 
-      // Si se cargó la versión para usuarios autenticados, inicializar menú de perfil
-      if(useLogged){
-        const profileBtn = placeholder.querySelector('.profile-btn');
-        const profileMenu = placeholder.querySelector('.profile-menu');
-        if(profileBtn && profileMenu){
-          profileBtn.addEventListener('click', (e) => {
-            const expanded = profileBtn.getAttribute('aria-expanded') === 'true';
-            profileBtn.setAttribute('aria-expanded', (!expanded).toString());
-            profileMenu.classList.toggle('show', !expanded);
-            profileMenu.setAttribute('aria-hidden', expanded.toString());
-            if(!expanded){
-              // focus to first menu item when opened
-              const first = profileMenu.querySelector('[role="menuitem"]');
-              if(first) setTimeout(()=> first.focus(), 0);
-            }
-          });
+      if (!useLogged) return;
 
-          // Close menu on outside click
-          document.addEventListener('click', (e) => {
-            if(!placeholder.contains(e.target)){
-              profileMenu.classList.remove('show');
-              profileBtn.setAttribute('aria-expanded', 'false');
-              profileMenu.setAttribute('aria-hidden', 'true');
-            }
-          });
+      // 🔐 Usuario autenticado
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session?.user) return;
 
-          // Close on Escape
-          document.addEventListener('keydown', (e) => {
-            if(e.key === 'Escape'){
-              profileMenu.classList.remove('show');
-              profileBtn.setAttribute('aria-expanded', 'false');
-              profileMenu.setAttribute('aria-hidden', 'true');
-              profileBtn.focus();
-            }
-          });
+      // 🎭 Obtener rol desde perfiles
+      const { data: perfil, error } = await supabaseClient
+        .from('perfiles')
+        .select('rol')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) {
+        console.error('Error obteniendo rol:', error);
+        return;
+      }
+
+      const role = perfil?.rol || 'aspirante';
+
+      const profileMenu = placeholder.querySelector('.profile-menu');
+      const profileBtn = placeholder.querySelector('.profile-btn');
+
+      if (!profileMenu || !profileBtn) return;
+
+      // 🧱 Construcción del menú por rol
+      let menuHTML = '';
+
+      if (role === 'aspirante') {
+        menuHTML = `
+          <a href="d-aspirante.html" role="menuitem">Inicio</a>
+          <a href="mis-datos.html" role="menuitem">Mis datos</a>
+          <a href="mis-archivos.html" role="menuitem">Mis archivos</a>
+          <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
+        `;
+      }
+
+      if (role === 'estudiante') {
+        menuHTML = `
+          <a href="dashboard.html" role="menuitem">Inicio</a>
+          <a href="mis-datos.html" role="menuitem">Mis datos</a>
+          <a href="cursos.html" role="menuitem">Cursos</a>
+          <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
+        `;
+      }
+
+      profileMenu.innerHTML = menuHTML;
+
+      // 🧠 Interacción menú
+      profileBtn.addEventListener('click', () => {
+        const expanded = profileBtn.getAttribute('aria-expanded') === 'true';
+        profileBtn.setAttribute('aria-expanded', (!expanded).toString());
+        profileMenu.classList.toggle('show', !expanded);
+        profileMenu.setAttribute('aria-hidden', expanded.toString());
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!placeholder.contains(e.target)) {
+          profileMenu.classList.remove('show');
+          profileBtn.setAttribute('aria-expanded', 'false');
+          profileMenu.setAttribute('aria-hidden', 'true');
         }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          profileMenu.classList.remove('show');
+          profileBtn.setAttribute('aria-expanded', 'false');
+          profileMenu.setAttribute('aria-hidden', 'true');
+          profileBtn.focus();
+        }
+      });
+
+      // 🚪 Logout
+      const logoutBtn = profileMenu.querySelector('#logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+          await supabaseClient.auth.signOut();
+          window.location.href = 'index.html';
+        });
       }
     })
     .catch(err => console.error('Error cargando la cabecera:', err));

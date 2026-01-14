@@ -2,17 +2,25 @@
   <a href="index.html" class="logo" aria-label="Inicio">
     <img src="img/Banner SSA.png" alt="SSA banner" class="header-banner">
   </a>
-  <div class="header-title">Sistema de seguimiento<br> al aprendizaje y la permanencia</div>
+
+  <div class="header-title">
+    Sistema de seguimiento<br>
+    al aprendizaje y la permanencia
+  </div>
+
   <div class="nav-actions">
     <div class="profile">
-      <button class="profile-btn" aria-haspopup="true" aria-expanded="false" aria-label="Abrir menú de perfil">
+      <button
+        class="profile-btn"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="Abrir menú de perfil"
+      >
         <img src="img/unadm-logo.jpeg" alt="Foto de perfil">
       </button>
-      <div class="profile-menu" role="menu" aria-hidden="true">
-        <a href="#" role="menuitem">Mis datos</a>
-        <a href="#" role="menuitem">Mis archivos</a>
-        <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
-      </div>
+
+      <!-- 🔽 JS inyecta aquí las opciones -->
+      <div class="profile-menu" role="menu" aria-hidden="true"></div>
     </div>
   </div>
 </header>
