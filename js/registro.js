@@ -28,7 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1️⃣ Crear usuario en Authentication
       const { data: authData, error: authError } = await supabaseClient.auth.signUp({
         email,
-        password
+        password,
+  options: {
+    emailRedirectTo: null,
+    shouldCreateUser: true
+  }
       });
 
       if (authError) throw authError;
@@ -36,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2️⃣ Guardar datos extra en tabla perfiles usando el id de Auth
       const { data, error } = await supabaseClient
         .from('perfiles')
-        .insert([
+        .upsert([
           {
             id: authData.user.id,
             nombre,
