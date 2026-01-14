@@ -1,12 +1,9 @@
 /* js/registro.js
- * Guardado automático de perfil tras registro en Supabase Auth.
- * - Valida campos obligatorios
- * - Registra en Auth (email, password)
- * - Si hay sesión: guarda/actualiza perfil en tabla `perfiles` (id = user.id)
- * - Si no hay sesión: guarda temporalmente en localStorage y lo reintenta en el login
+ * Flujo mínimo de registro con Supabase Auth.
+ * - Valida campos básicos (email, password, confirmación)
+ * - Registra en Auth: `auth.signUp({ email, password })`
+ * - NO inserta ni actualiza perfiles desde el frontend (se espera trigger en Supabase)
  */
-
-const PENDING_PROFILE_KEY = 'pending_profile_v1';
 
 document.addEventListener('DOMContentLoaded', function () {
   try {
@@ -44,19 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    function savePendingProfile(profile) {
-      try {
-        localStorage.setItem(PENDING_PROFILE_KEY, JSON.stringify(profile));
-      } catch (e) {
-        console.warn('No se pudo guardar profile pendiente en localStorage', e);
-      }
-    }
-
-    async function upsertProfile(profile) {
-      // usa upsert para que no falle si ya existe
-      return window.supabaseClient.from('perfiles').upsert([profile]);
-    }
-
     let submitHandlerAttached = false;
 
     async function handleSubmit(e) {
@@ -68,17 +52,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = emailInput ? (emailInput.value || '').trim() : '';
         const password = passwordInput ? (passwordInput.value || '') : '';
         const passwordConfirm = passwordConfirmInput ? (passwordConfirmInput.value || '') : '';
-        const edadRaw = edadInput ? (edadInput.value || '') : '';
-        const institucion = institucionInput ? (institucionInput.value || '').trim() : '';
-        const grado = gradoInput ? (gradoInput.value || '').trim() : '';
 
-        // Validaciones
-        if (!nombre) {
-          setError('El nombre es obligatorio.');
-          return;
-        }
+        // Validaciones básicas (email, password, confirmación)
         if (!email) {
           setError('El correo es obligatorio.');
+          return;
+        }
+        const emailBasicRegex = /^\S+@\S+\.\S+$/;
+        if (!emailBasicRegex.test(email)) {
+          setError('Introduce un correo válido.');
           return;
         }
         if (!password) {
@@ -90,25 +72,11 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
-        // validar edad si existe
-        let edad = null;
-        if (edadRaw) {
-          const n = parseInt(edadRaw, 10);
-          if (Number.isNaN(n) || n < 0) {
-            setError('La edad debe ser un número válido.');
-            return;
-          }
-          edad = n;
-        }
-
-        // Asumimos que window.supabaseClient existe y está inicializado (supabase.js sincronizado)
+        // Llamada mínima a Supabase Auth: solo signUp(email, password)
         setProcessing(true);
-
         let result;
         try {
-          // Determinar URL de redirección: en desarrollo usamos el origin local, en producción forzamos la URL de Vercel
-          const redirectUrl = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? `${location.origin}/` : 'https://sistema-gules-psi.vercel.app';
-          result = await window.supabaseClient.auth.signUp({ email, password }, { emailRedirectTo: redirectUrl });
+          result = await window.supabaseClient.auth.signUp({ email, password });
         } catch (err) {
           console.error('Error en signUp:', err);
           setError('Ocurrió un error al comunicarse con el servicio de autenticación. Intenta más tarde.');
@@ -116,71 +84,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const error = result && (result.error || (result.data && result.data.error));
-        const data = result && (result.data || result);
-
         if (error) {
           setError(error.message || 'Error al registrarse.');
           return;
         }
 
-        // Preparar perfil
-        const userId = data && data.user && data.user.id ? data.user.id : null;
-        const profile = {
-          id: userId,
-          email,
-          nombre,
-          edad,
-          institucion,
-          grado,
-        };
+        // Éxito: mostrar mensaje claro al usuario. NO redirigir ni guardar perfil desde el frontend.
+        alert('Registro exitoso. Revisa tu correo para confirmar tu cuenta.');
 
-        // Si existe sesión (usuario autenticado automáticamente), intentamos guardar inmediatamente
-        if (data && data.session && userId) {
-          try {
-            const { error: upsertErr } = await upsertProfile(profile);
-            if (upsertErr) {
-              console.error('Error guardando perfil tras registro:', upsertErr);
-              setError('Usuario creado, pero no se pudo guardar el perfil: ' + (upsertErr.message || upsertErr));
-              return;
-            }
-
-            // Perfil guardado, redirigir
-            window.location.href = 'dashboard.html';
-            return;
-          } catch (err) {
-            console.error('Excepción guardando perfil:', err);
-            setError('Usuario creado, pero ocurrió un error guardando el perfil. Intenta iniciar sesión más tarde.');
-            return;
-          }
-        }
-
-        // Si no hay sesión, intentamos insertar (puede fallar por RLS). Si falla, guardamos en localStorage
-        if (userId) {
-          try {
-            const { error: upsertErr } = await upsertProfile(profile);
-            if (upsertErr) {
-              // probable causa: no autenticación (sin sesión) o política RLS
-              console.warn('No se pudo insertar perfil inmediatamente:', upsertErr);
-              savePendingProfile(profile);
-              setError('Registro recibido. Revisa tu correo para confirmar la cuenta. Tus datos se guardarán cuando inicies sesión.');
-              return;
-            }
-
-            // Upsert sin error: redirigimos
-            window.location.href = 'dashboard.html';
-            return;
-          } catch (err) {
-            console.warn('Error al insertar perfil sin sesión:', err);
-            savePendingProfile(profile);
-            setError('Registro recibido. Revisa tu correo para confirmar la cuenta. Tus datos se guardarán cuando inicies sesión.');
-            return;
-          }
-        }
-
-        // No hay userId: informar y guardar pendiente por email
-        savePendingProfile({ id: null, email, nombre, edad, institucion, grado });
-        setError('Registro recibido. Revisa tu correo para confirmar la cuenta. El enlace de confirmación redirigirá a: ' + redirectUrl + ' Tus datos se guardarán cuando inicies sesión.');
-
+      } catch (err) {
+        console.error(err);
+        setError('Error inesperado. Intenta de nuevo más tarde.');
+      } finally {
+        setProcessing(false);
+      }
+    }
       } catch (err) {
         console.error(err);
         setError('Error inesperado. Intenta de nuevo más tarde.');

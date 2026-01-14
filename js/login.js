@@ -87,63 +87,9 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
-        // Autenticación exitosa -> intentar aplicar perfil pendiente (si existe)
-        try {
-          const userId = (data && data.user && data.user.id) || null;
-          const PENDING_PROFILE_KEY = 'pending_profile_v1';
-          let pendingFailed = false;
-
-          if (userId) {
-            try {
-              const pendingRaw = localStorage.getItem(PENDING_PROFILE_KEY);
-              if (pendingRaw) {
-                const pending = JSON.parse(pendingRaw);
-                // verificar que el email coincida antes de aplicar
-                if (pending && pending.email && pending.email.toLowerCase() === email.toLowerCase()) {
-                  const profile = {
-                    id: userId,
-                    email: pending.email,
-                    nombre: pending.nombre || null,
-                    edad: typeof pending.edad === 'number' ? pending.edad : null,
-                    institucion: pending.institucion || null,
-                    grado: pending.grado || null,
-                  };
-
-                  const { error: upsertErr } = await window.supabaseClient.from('perfiles').upsert([profile]);
-                  if (upsertErr) {
-                    console.error('No se pudo guardar el perfil pendiente:', upsertErr);
-                    setError('Autenticado, pero no fue posible guardar tu perfil automáticamente. Puedes intentarlo más tarde.');
-                    pendingFailed = true;
-                  } else {
-                    // limpiar pendiente
-                    localStorage.removeItem(PENDING_PROFILE_KEY);
-                  }
-                }
-              }
-            } catch (err) {
-              console.error('Error procesando perfil pendiente:', err);
-            }
-          }
-
-          // Redirigir al dashboard (no rutas por usuario)
-          if (pendingFailed) {
-            // dar tiempo para que el usuario vea el mensaje
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
-          } else {
-            window.location.href = 'dashboard.html';
-          }
-        } catch (err) {
-          console.error('Error al aplicar perfil pendiente:', err);
-          window.location.href = 'dashboard.html';
-        }
-
-        // Redirigir al dashboard (no rutas por usuario)
-        if (typeof pendingFailed !== 'undefined' && pendingFailed) {
-          // dar tiempo para que el usuario vea el mensaje
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
-        } else {
-          window.location.href = 'dashboard.html';
-        }
+        // Autenticación exitosa -> redirigir al dashboard
+        window.location.href = 'dashboard.html';
+        return;
       } catch (err) {
         console.error('Error en submit de login:', err);
         setError('Error inesperado. Intenta de nuevo más tarde.');

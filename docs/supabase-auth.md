@@ -16,7 +16,7 @@
 3. La aplicación debe leer esos tokens y **establecer la sesión en el cliente** (ej.: `auth.setSession` o mediante `getSessionFromUrl`/`onAuthStateChange`) para que el usuario quede autenticado automáticamente.
 
 ## Recomendaciones implementadas en este repositorio
-- `registro.js` ahora incluye explícitamente `emailRedirectTo` con la URL de Vercel en producción y usa `location.origin` en local para facilitar desarrollo.
+- `registro.js` ahora realiza únicamente `auth.signUp({ email, password })` (no guarda perfiles ni usa workarounds con localStorage). Asegúrate de que en Supabase la `Site URL` y `Redirect URLs` estén correctamente configuradas a tu dominio de producción (Vercel).
 - Se agregó `js/auth-redirect.js` para detectar tokens en la URL, llamar a `supabase.auth.setSession(...)`, limpiar la URL y redirigir al `dashboard.html`.
 - `js/supabase.js` registra un `onAuthStateChange` para reaccionar a cambios de sesión y, cuando corresponde, redirigir al dashboard.
 
