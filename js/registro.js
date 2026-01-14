@@ -31,37 +31,43 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Guardar temporalmente datos para usar tras confirmación
-    localStorage.setItem('pending_nombre', nombre);
-    localStorage.setItem('pending_edad', edad || '');
-    localStorage.setItem('pending_institucion', institucion || '');
-    localStorage.setItem('pending_grado', grado || '');
-
     try {
-      // Registrar usuario en Auth
-      const { data, error } = await window.supabaseClient.auth.signUp({
+      // 1️⃣ Crear usuario en Auth
+      const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // tu URL real
+          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html'
         }
       });
 
-      if (error) {
-        console.error('Error en signUp:', error);
-        alert('Error al registrarse: ' + error.message);
-        return;
+      if (signUpError) throw signUpError;
+
+      // 2️⃣ Insertar perfil inmediatamente con email_verified = false
+      if (signUpData.user) {
+        const { data: perfilData, error: perfilError } = await supabaseClient
+          .from('perfiles')
+          .upsert({
+            id: signUpData.user.id,
+            email,
+            nombre,
+            edad: edad || null,
+            institucion: institucion || null,
+            grado: grado || null,
+            email_verified: false
+          })
+          .select();
+
+        if (perfilError) throw perfilError;
+        console.log('Perfil creado:', perfilData);
       }
 
-      console.log('Registro exitoso:', data);
       alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
-
-      // Limpiar formulario
       form.reset();
 
     } catch (err) {
-      console.error('Error inesperado:', err);
-      alert('Ocurrió un error inesperado.');
+      console.error('Error en registro:', err);
+      alert('Ocurrió un error: ' + err.message);
     }
   });
 });
