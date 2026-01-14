@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let result;
         try {
           // Determinar URL de redirección: en desarrollo usamos el origin local, en producción forzamos la URL de Vercel
-          const redirectUrl = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? `${location.origin}/` : 'https://sistema-gules-psi.vercel.app/';
+          const redirectUrl = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? `${location.origin}/` : 'https://sistema-gules-psi.vercel.app';
           result = await window.supabaseClient.auth.signUp({ email, password }, { emailRedirectTo: redirectUrl });
         } catch (err) {
           console.error('Error en signUp:', err);
