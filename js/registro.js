@@ -1,65 +1,82 @@
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('registro.js cargado');
+const PENDING_PROFILE_KEY = 'pending_profile_v1';
 
-  const form = document.getElementById('registroForm');
-  if (!form) return;
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    console.log('registro.js cargado');
+    const form = document.getElementById('registroForm');
+    if (!form) return;
 
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const passwordConfirmInput = document.getElementById('passwordConfirm');
-  const errorEl = document.getElementById('passwordError');
-  const submitBtn = form.querySelector('button[type="submit"]');
+    const nombreInput = document.getElementById('nombre');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('passwordConfirm');
+    const edadInput = document.getElementById('edad');
+    const institucionInput = document.getElementById('institucion');
+    const gradoInput = document.getElementById('grado');
+    const errorEl = document.getElementById('passwordError');
+    const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
 
-  function setError(msg) {
-    if (!errorEl) return;
-    errorEl.textContent = msg || '';
-    errorEl.classList.toggle('show', Boolean(msg));
-  }
-
-  function setProcessing(isProcessing) {
-    if (submitBtn) submitBtn.disabled = isProcessing;
-    form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    setError('');
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    const passwordConfirm = passwordConfirmInput.value;
-
-    if (!email || !password) {
-      setError('Correo y contraseña son obligatorios.');
-      return;
+    function setError(msg) {
+      if (!errorEl) return;
+      errorEl.textContent = msg || '';
+      errorEl.classList.toggle('show', Boolean(msg));
     }
 
-    if (password !== passwordConfirm) {
-      setError('Las contraseñas no coinciden.');
-      return;
+    function clearError() { setError(''); }
+    function setProcessing(isProcessing) {
+      if (submitBtn) submitBtn.disabled = Boolean(isProcessing);
+      form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
     }
 
-    setProcessing(true);
+    async function handleSubmit(e) {
+      e.preventDefault();
+      clearError();
 
-    try {
-      const { error } = await window.supabaseClient.auth.signUp({
-        email,
-        password
-      });
+      const nombre = nombreInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const passwordConfirm = passwordConfirmInput.value;
+      const edadRaw = edadInput.value.trim();
+      const edad = edadRaw ? parseInt(edadRaw, 10) : null;
+      const institucion = institucionInput.value.trim();
+      const grado = gradoInput.value.trim();
 
-      if (error) {
-        setError(error.message);
-        return;
+      // Validaciones
+      if (!nombre) return setError('El nombre es obligatorio.');
+      if (!email) return setError('El correo es obligatorio.');
+      if (!password) return setError('La contraseña es obligatoria.');
+      if (password !== passwordConfirm) return setError('Las contraseñas no coinciden.');
+      if (edadRaw && (Number.isNaN(edad) || edad < 0)) return setError('La edad debe ser un número válido.');
+
+      setProcessing(true);
+
+      try {
+        const { data, error } = await window.supabaseClient.auth.signUp({
+          email,
+          password
+        });
+
+        if (error) return setError(error.message || 'Error al registrarse.');
+
+        // Guardar datos adicionales en localStorage para usar luego
+        localStorage.setItem('pending_nombre', nombre);
+        localStorage.setItem('pending_edad', edadRaw || '');
+        localStorage.setItem('pending_institucion', institucion);
+        localStorage.setItem('pending_grado', grado);
+
+        alert('Registro enviado. Revisa tu correo para confirmar la cuenta.');
+
+        // No redirigir aquí, se redirige automáticamente al confirmar el correo
+      } catch (err) {
+        console.error('Error en signUp:', err);
+        setError('Ocurrió un error al registrarse. Intenta más tarde.');
+      } finally {
+        setProcessing(false);
       }
-
-      alert('Registro exitoso. Revisa tu correo para confirmar tu cuenta.');
-      form.reset();
-
-    } catch (err) {
-      console.error(err);
-      setError('Error inesperado. Intenta más tarde.');
-    } finally {
-      setProcessing(false);
     }
-  });
+
+    form.addEventListener('submit', handleSubmit);
+  } catch (err) {
+    console.error('Inicialización de registro falló:', err);
+  }
 });

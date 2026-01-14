@@ -17,23 +17,6 @@
   // Inicializa el cliente de forma síncrona
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   window.supabaseClient = supabaseClient;
-
-  // Manejar cambios de estado de autenticación (útil al volver desde el link de confirmación)
-  if (supabaseClient && supabaseClient.auth && typeof supabaseClient.auth.onAuthStateChange === 'function') {
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('[supabase] onAuthStateChange', event, session);
-      // Si hay sesión activa y estamos en la raíz, redirigimos al dashboard
-      try {
-        if (session && session.user) {
-          if (location.pathname === '/' || location.pathname.endsWith('index.html')) {
-            window.location.href = 'dashboard.html';
-          }
-        }
-      } catch (e) {
-        console.warn('[supabase] onAuthStateChange handler error', e);
-      }
-    });
-  }
 })();
 
   // Nota: por ahora no guardamos datos de perfil en Auth; esos campos adicionales
