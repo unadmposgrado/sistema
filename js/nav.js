@@ -30,7 +30,7 @@
       // 🎭 Obtener rol desde perfiles
       const { data: perfil, error } = await supabaseClient
         .from('perfiles')
-        .select('rol')
+        .select('role')
         .eq('id', session.user.id)
         .single();
 
@@ -39,7 +39,7 @@
         return;
       }
 
-      const role = perfil?.rol || 'aspirante';
+      const role = perfil?.role || 'aspirante';
 
       const profileMenu = placeholder.querySelector('.profile-menu');
       const profileBtn = placeholder.querySelector('.profile-btn');
