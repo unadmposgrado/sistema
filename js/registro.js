@@ -31,44 +31,37 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Guardar temporalmente datos para usar tras confirmación
+    localStorage.setItem('pending_nombre', nombre);
+    localStorage.setItem('pending_edad', edad || '');
+    localStorage.setItem('pending_institucion', institucion || '');
+    localStorage.setItem('pending_grado', grado || '');
+
     try {
-      // 1️⃣ Registrar en Auth
-      const { data: signUpData, error: signUpError } = await window.supabaseClient.auth.signUp({
+      // Registrar usuario en Auth
+      const { data, error } = await window.supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // <- tu URL real
+          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // tu URL real
         }
       });
 
-      if (signUpError) throw signUpError;
-      console.log('Usuario creado en Auth:', signUpData);
-
-      // 2️⃣ Insertar en tabla perfiles usando el ID del usuario
-      if (signUpData.user) {
-        const { data: perfilData, error: perfilError } = await window.supabaseClient
-          .from('perfiles')
-          .insert([{
-            id: signUpData.user.id, // ID vinculado al Auth
-            email,
-            nombre,
-            edad: edad || null,
-            institucion: institucion || null,
-            grado: grado || null
-          }]);
-
-        if (perfilError) throw perfilError;
-        console.log('Perfil insertado:', perfilData);
+      if (error) {
+        console.error('Error en signUp:', error);
+        alert('Error al registrarse: ' + error.message);
+        return;
       }
 
+      console.log('Registro exitoso:', data);
       alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
 
-      // Opcional: limpiar el formulario
+      // Limpiar formulario
       form.reset();
 
     } catch (err) {
-      console.error('Error en registro:', err);
-      alert('Ocurrió un error: ' + err.message);
+      console.error('Error inesperado:', err);
+      alert('Ocurrió un error inesperado.');
     }
   });
 });
