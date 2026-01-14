@@ -1,7 +1,7 @@
 // js/dashboard.js
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    // 1️⃣ Verificar sesión
+    // Verificar sesión
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     if (!session?.user) {
       window.location.href = 'login.html';
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userId = session.user.id;
     console.log('Usuario logueado:', session.user);
 
-    // 2️⃣ Esperar a que se cargue el navbar dinámico
+    // Esperar a que se cargue el navbar dinámico
     const navPlaceholder = document.getElementById('nav-placeholder');
     const waitForNav = () => new Promise(resolve => {
       if (navPlaceholder.innerHTML.trim() !== '') resolve();
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     await waitForNav();
 
-    // 3️⃣ Configurar botón de logout si existe
+    // Configurar botón de logout si existe
     const logoutBtn = navPlaceholder.querySelector('#logoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // 4️⃣ Traer datos del usuario desde la tabla "perfiles"
+    // Traer datos del usuario desde la tabla "perfiles"
     const { data: perfilData, error: perfilError } = await window.supabaseClient
       .from('perfiles')
       .select('*')
@@ -55,15 +55,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 5️⃣ Inyectar datos en el HTML
+    // Inyectar datos en el HTML
     // Suponiendo que tu HTML tiene contenedores con estos IDs
     const nameElem = document.querySelector('.student-name');
     const programElem = document.querySelector('.program');
     const tutorElem = document.querySelector('.tutor'); // Por ahora puedes dejar vacío o estático
 
     if (nameElem) nameElem.textContent = `Bienvenido, ${perfilData.nombre}`;
-    if (programElem) programElem.textContent = `Programa educativo: ${perfilData.grado || ''}`;
-    if (tutorElem) tutorElem.textContent = `Tutor: ${perfilData.institucion || 'Por asignar'}`;
+    if (programElem) programElem.textContent = `Programa educativo: ${perfilData.programElem || ''}`;
+    if (tutorElem) tutorElem.textContent = `Tutor: ${perfilData.tutorElem || 'Por asignar'}`;
 
     // Opcional: podrías actualizar progreso y otros datos cuando tengas otras tablas
 
