@@ -1,82 +1,62 @@
-const PENDING_PROFILE_KEY = 'pending_profile_v1';
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('registroForm');
+  if (!form) return;
 
-document.addEventListener('DOMContentLoaded', function () {
-  try {
-    console.log('registro.js cargado');
-    const form = document.getElementById('registroForm');
-    if (!form) return;
+  const nombreInput = document.getElementById('nombre');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const passwordConfirmInput = document.getElementById('passwordConfirm');
+  const edadInput = document.getElementById('edad');
+  const institucionInput = document.getElementById('institucion');
+  const gradoInput = document.getElementById('grado');
 
-    const nombreInput = document.getElementById('nombre');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const passwordConfirmInput = document.getElementById('passwordConfirm');
-    const edadInput = document.getElementById('edad');
-    const institucionInput = document.getElementById('institucion');
-    const gradoInput = document.getElementById('grado');
-    const errorEl = document.getElementById('passwordError');
-    const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    function setError(msg) {
-      if (!errorEl) return;
-      errorEl.textContent = msg || '';
-      errorEl.classList.toggle('show', Boolean(msg));
+    const nombre = nombreInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const passwordConfirm = passwordConfirmInput.value;
+    const edad = edadInput.value.trim();
+    const institucion = institucionInput.value.trim();
+    const grado = gradoInput.value.trim();
+
+    if (!nombre || !email || !password) {
+      alert('Nombre, correo y contraseña son obligatorios.');
+      return;
     }
 
-    function clearError() { setError(''); }
-    function setProcessing(isProcessing) {
-      if (submitBtn) submitBtn.disabled = Boolean(isProcessing);
-      form.setAttribute('aria-busy', isProcessing ? 'true' : 'false');
+    if (password !== passwordConfirm) {
+      alert('Las contraseñas no coinciden.');
+      return;
     }
 
-    async function handleSubmit(e) {
-      e.preventDefault();
-      clearError();
+    // Guardar temporalmente datos extra en localStorage
+    localStorage.setItem('pending_nombre', nombre);
+    localStorage.setItem('pending_edad', edad || '');
+    localStorage.setItem('pending_institucion', institucion || '');
+    localStorage.setItem('pending_grado', grado || '');
 
-      const nombre = nombreInput.value.trim();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      const passwordConfirm = passwordConfirmInput.value;
-      const edadRaw = edadInput.value.trim();
-      const edad = edadRaw ? parseInt(edadRaw, 10) : null;
-      const institucion = institucionInput.value.trim();
-      const grado = gradoInput.value.trim();
+    try {
+      const { data, error } = await window.supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: 'https://tu-sitio.vercel.app/dashboard.html' // <- Cambia por tu URL de Vercel
+        }
+      });
 
-      // Validaciones
-      if (!nombre) return setError('El nombre es obligatorio.');
-      if (!email) return setError('El correo es obligatorio.');
-      if (!password) return setError('La contraseña es obligatoria.');
-      if (password !== passwordConfirm) return setError('Las contraseñas no coinciden.');
-      if (edadRaw && (Number.isNaN(edad) || edad < 0)) return setError('La edad debe ser un número válido.');
-
-      setProcessing(true);
-
-      try {
-        const { data, error } = await window.supabaseClient.auth.signUp({
-          email,
-          password
-        });
-
-        if (error) return setError(error.message || 'Error al registrarse.');
-
-        // Guardar datos adicionales en localStorage para usar luego
-        localStorage.setItem('pending_nombre', nombre);
-        localStorage.setItem('pending_edad', edadRaw || '');
-        localStorage.setItem('pending_institucion', institucion);
-        localStorage.setItem('pending_grado', grado);
-
-        alert('Registro enviado. Revisa tu correo para confirmar la cuenta.');
-
-        // No redirigir aquí, se redirige automáticamente al confirmar el correo
-      } catch (err) {
-        console.error('Error en signUp:', err);
-        setError('Ocurrió un error al registrarse. Intenta más tarde.');
-      } finally {
-        setProcessing(false);
+      if (error) {
+        console.error('Error en signUp:', error);
+        alert('Error al registrarse: ' + error.message);
+        return;
       }
-    }
 
-    form.addEventListener('submit', handleSubmit);
-  } catch (err) {
-    console.error('Inicialización de registro falló:', err);
-  }
+      console.log('Registro exitoso:', data);
+      alert('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      alert('Ocurrió un error inesperado.');
+    }
+  });
 });
