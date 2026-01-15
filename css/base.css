@@ -227,6 +227,111 @@ label {
 }
 
 /* ============================================================
+   COMPONENTES: NAVEGACIÓN SUPERIOR
+============================================================ */
+.top-nav {
+  background: #29473f;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.top-nav .logo {
+  display: inline-block;
+  text-decoration: none;
+  margin-right: var(--spacing-md);
+}
+
+.top-nav .logo img {
+  border: 0;
+  display: block;
+  height: 50px;
+}
+
+.top-nav .header-title {
+  color: var(--white);
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+.nav-actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.profile {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+}
+
+.profile-btn:hover {
+  transform: scale(1.1);
+}
+
+.profile-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.profile-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 180px;
+  background: var(--white);
+  color: var(--text-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  z-index: 1001;
+}
+
+.profile-menu a {
+  display: block;
+  padding: var(--spacing-md) var(--spacing-md);
+  color: inherit;
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  transition: background-color var(--transition-fast);
+}
+
+.profile-menu a:hover {
+  background-color: var(--light-bg);
+}
+
+.profile-menu.show {
+  display: block;
+}
+
+/* ============================================================
    COMPONENTES: SECCIONES
 ============================================================ */
 .info-section {
