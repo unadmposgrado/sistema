@@ -5,12 +5,21 @@
  * Responsabilidades:
  * - Validar sesión del usuario
  * - Detectar rol desde Supabase (perfiles.role)
+ * - Validar estado del rol en config.js
  * - Cargar dinámicamente el layout correspondiente desde /layouts/
  * - Inicializar módulos JavaScript específicos del rol
  * - Manejar cierre de sesión
  *
  * Roles soportados: 'aspirante', 'estudiante', 'formador', 'admin'
  */
+
+// Importar configuración centralizada
+import {
+  isRoleEnabled,
+  isSystemInMaintenance,
+  getRoleStatusMessage,
+  getMaintenanceMessage,
+} from './config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -47,6 +56,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const userRole = perfil.role || 'aspirante';
     console.log('🎭 Rol del usuario:', userRole);
+
+    // ============================================================
+    // 2.5. VALIDAR ESTADO DEL SISTEMA Y ROL (config.js)
+    // ============================================================
+    // Verificar si el sistema está en mantenimiento
+    if (isSystemInMaintenance()) {
+      const layoutContainer = document.getElementById('layout-container');
+      if (layoutContainer) {
+        layoutContainer.innerHTML = `
+          <div style="padding: 2rem; text-align: center; background: #fff3cd; border-radius: 8px; margin: 2rem;">
+            <h2>🔧 Mantenimiento del Sistema</h2>
+            <p style="font-size: 1.1rem; color: #856404;">${getMaintenanceMessage()}</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">Por favor, intenta nuevamente en unos momentos.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Verificar si el rol está habilitado
+    if (!isRoleEnabled(userRole)) {
+      const layoutContainer = document.getElementById('layout-container');
+      if (layoutContainer) {
+        const statusMessage = getRoleStatusMessage(userRole);
+        layoutContainer.innerHTML = `
+          <div style="padding: 2rem; text-align: center; background: #f8d7da; border-radius: 8px; margin: 2rem;">
+            <h2>⚠️ Rol No Disponible</h2>
+            <p style="font-size: 1.1rem; color: #721c24;">${statusMessage}</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">Contacta con el administrador del sistema.</p>
+          </div>
+        `;
+      }
+      console.warn(`⛔ Rol ${userRole} deshabilitado. Acceso denegado.`);
+      return;
+    }
+
+    console.log(`✅ Rol ${userRole} validado y habilitado`);
 
     // ============================================================
     // 3. CARGAR LAYOUT DINÁMICAMENTE
