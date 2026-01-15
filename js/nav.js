@@ -51,9 +51,7 @@
 
       if (role === 'aspirante') {
         menuHTML = `
-          <a href="d-aspirante.html" role="menuitem">Inicio</a>
-          <a href="mis-datos.html" role="menuitem">Mis datos</a>
-          <a href="mis-archivos.html" role="menuitem">Mis archivos</a>
+          <a href="dashboard.html" role="menuitem">Inicio</a>
           <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
         `;
       }
@@ -61,8 +59,20 @@
       if (role === 'estudiante') {
         menuHTML = `
           <a href="dashboard.html" role="menuitem">Inicio</a>
-          <a href="mis-datos.html" role="menuitem">Mis datos</a>
-          <a href="cursos.html" role="menuitem">Cursos</a>
+          <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
+        `;
+      }
+
+      if (role === 'formador') {
+        menuHTML = `
+          <a href="dashboard.html" role="menuitem">Inicio</a>
+          <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
+        `;
+      }
+
+      if (role === 'admin') {
+        menuHTML = `
+          <a href="dashboard.html" role="menuitem">Inicio</a>
           <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>
         `;
       }

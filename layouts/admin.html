@@ -1,0 +1,98 @@
+<!-- layouts/admin.html
+     Layout del rol ADMINISTRADOR
+     Contiene secciones para: gestión de usuarios, contenido, métricas institucionales
+-->
+
+<div class="container">
+  <!-- Bienvenida -->
+  <h1 class="admin-name" id="welcomeName">Panel de administración</h1>
+
+  <!-- Estadísticas generales -->
+  <section class="stats-section">
+    <h2>Estadísticas generales</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total de usuarios</div>
+        <div class="stat-value" id="totalUsers">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Estudiantes activos</div>
+        <div class="stat-value" id="activeStudents">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Formadores</div>
+        <div class="stat-value" id="trainers">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Aspirantes en revisión</div>
+        <div class="stat-value" id="aspirants">0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gestión de usuarios -->
+  <section class="users-management-section">
+    <h2>Gestión de usuarios</h2>
+    <div class="users-controls">
+      <button class="btn-primary" id="addUserBtn">+ Agregar usuario</button>
+      <input type="text" id="userSearch" placeholder="Buscar usuario..." aria-label="Buscar usuario">
+      <select id="roleFilter" aria-label="Filtrar por rol">
+        <option value="">Todos los roles</option>
+        <option value="aspirante">Aspirante</option>
+        <option value="estudiante">Estudiante</option>
+        <option value="formador">Formador</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div id="usersList" class="users-list">
+      <p>Cargando usuarios...</p>
+    </div>
+  </section>
+
+  <!-- Gestión de contenido -->
+  <section class="content-management-section">
+    <h2>Gestión de contenido</h2>
+    <div class="content-controls">
+      <button class="btn-primary" id="addContentBtn">+ Nuevo contenido</button>
+    </div>
+    <div class="content-tabs">
+      <button class="content-tab active" data-tab="programs">Programas</button>
+      <button class="content-tab" data-tab="courses">Asignaturas</button>
+      <button class="content-tab" data-tab="modules">Módulos</button>
+    </div>
+    <div id="contentArea" class="content-area">
+      <p>Cargando contenido...</p>
+    </div>
+  </section>
+
+  <!-- Métricas e informes -->
+  <section class="metrics-section">
+    <h2>Métricas e informes institucionales</h2>
+    <div class="metrics-controls">
+      <select id="metricsRange" aria-label="Rango de fechas">
+        <option value="month">Este mes</option>
+        <option value="semester">Este semestre</option>
+        <option value="year">Este año</option>
+        <option value="all">Todos los tiempos</option>
+      </select>
+      <button class="btn-secondary" id="exportReportBtn">Exportar reporte</button>
+    </div>
+    <div id="metricsDisplay" class="metrics-display">
+      <p>Cargando métricas...</p>
+    </div>
+  </section>
+
+  <!-- Configuración del sistema -->
+  <section class="system-settings-section">
+    <h2>Configuración del sistema</h2>
+    <div class="settings-list">
+      <button class="settings-item" id="settingsNotifications">Notificaciones</button>
+      <button class="settings-item" id="settingsEmail">Plantillas de email</button>
+      <button class="settings-item" id="settingsBackup">Respaldos y recuperación</button>
+      <button class="settings-item" id="settingsLogs">Registros de actividad</button>
+    </div>
+  </section>
+</div>

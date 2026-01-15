@@ -1,0 +1,66 @@
+<!-- layouts/formador.html
+     Layout del rol FORMADOR / MONITOR
+     Contiene secciones para: gestión de grupos, evaluación, reportes analíticos
+-->
+
+<div class="container">
+  <!-- Bienvenida -->
+  <h1 class="trainer-name" id="welcomeName">Bienvenido, formador</h1>
+
+  <!-- Información del formador -->
+  <section class="info-section-group">
+    <h2>Tu información</h2>
+
+    <div class="info-section">
+      <div class="label">Especialidad</div>
+      <div class="value specialty" id="specialty">No asignada</div>
+    </div>
+
+    <div class="info-section">
+      <div class="label">Grupos asignados</div>
+      <div class="value groups-count" id="groupsCount">0</div>
+    </div>
+  </section>
+
+  <!-- Gestión de grupos -->
+  <section class="groups-management-section">
+    <h2>Tus grupos</h2>
+    <div class="search-filter-bar">
+      <input type="text" id="groupSearch" placeholder="Buscar grupo..." aria-label="Buscar grupo">
+      <select id="groupFilter" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        <option value="active">Activos</option>
+        <option value="closed">Cerrados</option>
+      </select>
+    </div>
+    <div id="groupsList" class="groups-list">
+      <p>Cargando grupos...</p>
+    </div>
+  </section>
+
+  <!-- Evaluación de estudiantes -->
+  <section class="evaluation-section">
+    <h2>Evaluación de estudiantes</h2>
+    <div class="evaluation-controls">
+      <select id="evaluationGroupFilter" aria-label="Seleccionar grupo para evaluar">
+        <option value="">Selecciona un grupo</option>
+      </select>
+    </div>
+    <div id="evaluationList" class="evaluation-list">
+      <p>Selecciona un grupo para evaluar.</p>
+    </div>
+  </section>
+
+  <!-- Reportes y analytics -->
+  <section class="reports-section">
+    <h2>Reportes y análisis</h2>
+    <div class="reports-tabs">
+      <button class="report-tab active" data-tab="progress">Progreso grupal</button>
+      <button class="report-tab" data-tab="metrics">Métricas</button>
+      <button class="report-tab" data-tab="export">Exportar datos</button>
+    </div>
+    <div id="reportsContent" class="reports-content">
+      <p>Cargando reportes...</p>
+    </div>
+  </section>
+</div>

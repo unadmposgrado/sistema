@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
       }
 
-      // ✅ Login correcto → redirigir por rol
+      // Login correcto → redirigir por rol
       await redirectByRole(data.user.id);
 
     } catch (err) {
@@ -113,10 +113,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
       }
 
+      // ✅ NUEVA ARQUITECTURA: Todos los roles usan dashboard.html
+      // El orquestador (dashboard.js) carga el layout correspondiente
       if (perfil.role === 'aspirante') {
-        window.location.href = 'd-aspirante.html';
+        window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else if (perfil.role === 'estudiante') {
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard.html';  // Usa dashboard genérico
+      } else if (perfil.role === 'formador') {
+        window.location.href = 'dashboard.html';  // Usa dashboard genérico
+      } else if (perfil.role === 'admin') {
+        window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else {
         // Fallback seguro
         window.location.href = 'dashboard.html';

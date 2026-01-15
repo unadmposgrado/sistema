@@ -1,0 +1,77 @@
+/**
+ * css/estudiante.css
+ *
+ * Estilos específicos para el rol ESTUDIANTE
+ */
+
+.course-category {
+  margin-bottom: var(--spacing-xl);
+}
+
+.category-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.course-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.course-list li {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-list li strong {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-dark);
+}
+
+.course-list li small {
+  display: block;
+  color: var(--text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-section {
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.progress-section h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.evidences-section,
+.feedback-section {
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.evidences-section h2,
+.feedback-section h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .course-list {
+    grid-template-columns: 1fr;
+  }
+}

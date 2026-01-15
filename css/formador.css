@@ -1,0 +1,76 @@
+/**
+ * css/formador.css
+ *
+ * Estilos específicos para el rol FORMADOR / MONITOR
+ */
+
+.search-filter-bar,
+.evaluation-controls {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.search-filter-bar input,
+.search-filter-bar select,
+.evaluation-controls select {
+  flex: 1;
+  min-width: 200px;
+}
+
+.groups-management-section,
+.evaluation-section,
+.reports-section {
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.groups-management-section h2,
+.evaluation-section h2,
+.reports-section h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.groups-list,
+.evaluation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.groups-list > div,
+.evaluation-list > div {
+  padding: var(--spacing-lg);
+  background: var(--light-bg);
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--radius-md);
+}
+
+.report-tab {
+  margin-bottom: var(--spacing-lg);
+}
+
+.reports-content {
+  min-height: 300px;
+  padding: var(--spacing-lg);
+  background: var(--light-bg);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 768px) {
+  .search-filter-bar,
+  .evaluation-controls {
+    flex-direction: column;
+  }
+
+  .search-filter-bar input,
+  .search-filter-bar select,
+  .evaluation-controls select {
+    min-width: unset;
+  }
+}

@@ -1,0 +1,76 @@
+<!-- layouts/estudiante.html
+     Layout del rol ESTUDIANTE
+     Contiene secciones para: información personal, progreso, cursos, evidencias
+-->
+
+<div class="container">
+  <!-- Bienvenida -->
+  <h1 class="student-name" id="welcomeName">Bienvenido, estudiante</h1>
+
+  <!-- Información personal -->
+  <section class="info-section-group">
+    <h2>Tu información</h2>
+
+    <div class="info-section">
+      <div class="label">Programa educativo</div>
+      <div class="value program" id="program">Por asignar</div>
+    </div>
+
+    <div class="info-section">
+      <div class="label">Tutor asignado</div>
+      <div class="value tutor" id="tutor">Por asignar</div>
+    </div>
+
+    <div class="info-section">
+      <div class="label">Matrícula</div>
+      <div class="value matricula" id="matricula">---</div>
+    </div>
+  </section>
+
+  <!-- Progreso académico -->
+  <section class="progress-section">
+    <h2>Tu avance</h2>
+    <div class="info-section">
+      <div class="label">Progreso general</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+        <span class="progress-text" id="progressText">0%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cursos y asignaturas -->
+  <section class="courses-section">
+    <h2>Tus asignaturas</h2>
+
+    <div class="course-category">
+      <div class="category-title">En progreso</div>
+      <ul class="course-list in-progress" id="inProgressCourses">
+        <li class="placeholder">Cargando cursos...</li>
+      </ul>
+    </div>
+
+    <div class="course-category">
+      <div class="category-title">Concluidos</div>
+      <ul class="course-list completed" id="completedCourses">
+        <li class="placeholder">Cargando cursos...</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Evidencias y entregas -->
+  <section class="evidences-section">
+    <h2>Tus evidencias</h2>
+    <div id="evidencesList" class="evidence-list">
+      <p>No hay evidencias registradas aún.</p>
+    </div>
+  </section>
+
+  <!-- Retroalimentación del tutor -->
+  <section class="feedback-section">
+    <h2>Retroalimentación de tu tutor</h2>
+    <div id="feedbackList" class="feedback-list">
+      <p>No hay retroalimentación disponible aún.</p>
+    </div>
+  </section>
+</div>

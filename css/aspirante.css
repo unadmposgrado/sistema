@@ -1,0 +1,118 @@
+/**
+ * css/aspirante.css
+ *
+ * Estilos específicos para el rol ASPIRANTE
+ */
+
+/* Secciones específicas */
+.upload-section {
+  margin-top: var(--spacing-xl);
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.upload-card {
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.upload-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.upload-card h3 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.card-description {
+  color: var(--text-light);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.upload-card input[type="file"] {
+  display: block;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.upload-card input[type="file"]:hover {
+  border-color: var(--primary-color);
+}
+
+.upload-card .actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.upload-card .actions button {
+  flex: 1;
+}
+
+.files-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.file-name {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-dark);
+  flex: 1;
+}
+
+.file-date {
+  color: var(--text-light);
+  font-size: var(--font-size-sm);
+  margin: 0 var(--spacing-lg);
+}
+
+.file-item button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 768px) {
+  .upload-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .file-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .file-date {
+    margin: 0;
+  }
+
+  .file-item button {
+    width: 100%;
+  }
+}
