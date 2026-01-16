@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nombreInput = document.getElementById('nombre');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
-  const rolInput = document.getElementById('rol');
+  const passwordConfirmInput = document.getElementById('passwordConfirm');
   const submitBtn = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async (e) => {
@@ -14,15 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombre = nombreInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
-    const rol = rolInput?.value || 'aspirante';
+    const passwordConfirm = passwordConfirmInput.value;
 
-    if (!nombre || !email || !password) {
-      alert('Nombre, correo y contraseña son obligatorios.');
+    if (!nombre || !email || !password || !passwordConfirm) {
+      alert('Todos los campos son obligatorios.');
       return;
     }
 
     if (password.length < 6) {
       alert('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      alert('Las contraseñas no coinciden.');
       return;
     }
 
@@ -36,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         password,
         options: {
           data: {
-            nombre,
-            rol
+            nombre
           }
         }
       });
@@ -52,8 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
           {
             id: userId,
             nombre,
-            email,
-            rol
+            email
           }
         ]);
 
