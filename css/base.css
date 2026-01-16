@@ -560,3 +560,15 @@ label {
     text-align: center;
   }
 }
+
+/* ============================================================
+   LOADING STATE
+============================================================ */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  font-size: var(--font-size-lg);
+  color: var(--text-light);
+}

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     const { data: perfil, error: perfilError } = await window.supabaseClient
       .from('perfiles')
-      .select('rol')
+      .select('rol, onboarding_completo')
       .eq('id', userId)
       .single();
 
@@ -55,7 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const userRole = perfil.rol || 'aspirante';
+    const onboardingCompleto = perfil.onboarding_completo || false;
     console.log('🎭 Rol del usuario:', userRole);
+    console.log('✅ Onboarding completado:', onboardingCompleto);
 
     // ============================================================
     // 2.5. VALIDAR ESTADO DEL SISTEMA Y ROL (config.js)
@@ -93,6 +95,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     console.log(`✅ Rol ${userRole} validado y habilitado`);
+
+    // ============================================================
+    // 2.6. VERIFICAR ONBOARDING (si no es admin)
+    // ============================================================
+    if (userRole !== 'admin' && !onboardingCompleto) {
+      console.log('📝 Onboarding pendiente. Mostrando formulario...');
+      
+      const layoutContainer = document.getElementById('layout-container');
+      if (layoutContainer) {
+        layoutContainer.innerHTML = '<div class="loading">Cargando formulario de completar perfil...</div>';
+      }
+
+      // Cargar módulo de onboarding con import dinámico
+      try {
+        const { startOnboarding } = await import('../modules/onboarding/index.js');
+        await startOnboarding({ user: session.user, perfil });
+      } catch (err) {
+        console.error('❌ Error cargando onboarding:', err);
+        alert('Error al cargar el formulario de completar perfil.');
+        window.location.href = 'login.html';
+      }
+      return; // Detener aquí, el onboarding es bloqueante
+    }
+
+    console.log(`✅ Onboarding verificado. Continuando con dashboard normal...`);
 
     // ============================================================
     // 3. CARGAR LAYOUT DINÁMICAMENTE
