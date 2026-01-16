@@ -69,9 +69,7 @@ export async function startOnboarding({ user, perfil }) {
         const { data: newPerfil, error: createError } = await supabase
           .from('perfiles')
           .insert([{
-            id: userId,
-            rol: 'aspirante', // rol por defecto
-            onboarding_completo: false
+            id: userId
           }])
           .select()
           .single();

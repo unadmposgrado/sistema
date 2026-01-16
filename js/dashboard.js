@@ -39,18 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('✅ Sesión validada:', userId);
 
     // ============================================================
-    // 2. OBTENER ROL DEL USUARIO
+    // 2. OBTENER PERFIL DEL USUARIO
     // ============================================================
     const { data: perfil, error: perfilError } = await window.supabaseClient
       .from('perfiles')
-      .select('rol, onboarding_completo')
+      .select('id, rol, onboarding_completo') // <--- CORRECCIÓN: incluir id
       .eq('id', userId)
       .single();
 
-    // Permitir que el onboarding maneje perfiles inexistentes
-    // (los creará automáticamente)
     if (perfilError && perfilError.code !== 'PGRST116') {
-      // Error distinto a "no rows found"
       console.error('❌ Error obteniendo perfil:', perfilError);
       alert('No se pudo acceder a los datos del usuario.');
       window.location.href = 'login.html';
@@ -65,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     // 2.5. VALIDAR ESTADO DEL SISTEMA Y ROL (config.js)
     // ============================================================
-    // Verificar si el sistema está en mantenimiento
     if (isSystemInMaintenance()) {
       const layoutContainer = document.getElementById('layout-container');
       if (layoutContainer) {
@@ -80,7 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Verificar si el rol está habilitado
     if (!isRoleEnabled(userRole)) {
       const layoutContainer = document.getElementById('layout-container');
       if (layoutContainer) {
@@ -100,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log(`✅ Rol ${userRole} validado y habilitado`);
 
     // ============================================================
-    // 2.6. VERIFICAR ONBOARDING (si no es admin)
+    // 2.6. ONBOARDING
     // ============================================================
     if (userRole !== 'admin' && !onboardingCompleto) {
       console.log('📝 Onboarding pendiente. Mostrando formulario...');
@@ -110,7 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         layoutContainer.innerHTML = '<div class="loading">Cargando formulario de completar perfil...</div>';
       }
 
-      // Cargar módulo de onboarding con import dinámico
       try {
         const { startOnboarding } = await import('../modules/onboarding/index.js');
         await startOnboarding({ user: session.user, perfil });
@@ -119,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Error al cargar el formulario de completar perfil.');
         window.location.href = 'login.html';
       }
-      return; // Detener aquí, el onboarding es bloqueante
+      return; // bloquear flujo mientras se completa onboarding
     }
 
     console.log(`✅ Onboarding verificado. Continuando con dashboard normal...`);
@@ -156,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================================
-    // 4. CARGAR CSS ESPECÍFICO DEL ROL
+    // 4. CARGAR CSS DEL ROL
     // ============================================================
     const roleCssPath = `css/${userRole}.css`;
     const roleCssLink = document.getElementById('role-css');
@@ -166,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================================
-    // 5. ESPERAR A QUE NAV SE CARGUE (nav.js se ejecuta en paralelo)
+    // 5. ESPERAR NAV
     // ============================================================
     const navPlaceholder = document.getElementById('nav-placeholder');
     const waitForNav = () =>
@@ -185,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('✅ Navegación cargada');
 
     // ============================================================
-    // 6. CONFIGURAR LOGOUT (busca en nav dinámico)
+    // 6. LOGOUT
     // ============================================================
     const logoutBtn = navPlaceholder.querySelector('#logoutBtn');
     if (logoutBtn) {
@@ -203,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================================
-    // 7. INICIALIZAR MÓDULOS DEL ROL
+    // 7. INICIALIZAR MÓDULOS POR ROL
     // ============================================================
     console.log(`📦 Inicializando módulos para rol: ${userRole}`);
 
@@ -234,21 +228,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // ============================================================
 // INICIALIZADORES DE MÓDULOS POR ROL
+// (sin cambios respecto a tu versión original)
 // ============================================================
 
-/**
- * Inicializa módulos del rol 'aspirante'
- * Módulos: documentos, seguimiento
- */
 async function initAspiranteModules(userId) {
   console.log('📦 Cargando módulos de ASPIRANTE...');
-
-  // Importar y ejecutar módulo de documentos
   const documentsModule = document.createElement('script');
   documentsModule.src = 'modules/aspirante/documentos.js';
   document.body.appendChild(documentsModule);
 
-  // Importar y ejecutar módulo de seguimiento
   const trackingModule = document.createElement('script');
   trackingModule.src = 'modules/aspirante/seguimiento.js';
   document.body.appendChild(trackingModule);
@@ -256,13 +244,8 @@ async function initAspiranteModules(userId) {
   console.log('✅ Módulos de ASPIRANTE cargados');
 }
 
-/**
- * Inicializa módulos del rol 'estudiante'
- * Módulos: progreso, evidencias, retroalimentación
- */
 async function initEstudianteModules(userId) {
   console.log('📦 Cargando módulos de ESTUDIANTE...');
-
   const progressModule = document.createElement('script');
   progressModule.src = 'modules/estudiante/progreso.js';
   document.body.appendChild(progressModule);
@@ -278,13 +261,8 @@ async function initEstudianteModules(userId) {
   console.log('✅ Módulos de ESTUDIANTE cargados');
 }
 
-/**
- * Inicializa módulos del rol 'formador'
- * Módulos: grupos, evaluación, reportes
- */
 async function initFormadorModules(userId) {
   console.log('📦 Cargando módulos de FORMADOR...');
-
   const gruposModule = document.createElement('script');
   gruposModule.src = 'modules/formador/grupos.js';
   document.body.appendChild(gruposModule);
@@ -300,13 +278,8 @@ async function initFormadorModules(userId) {
   console.log('✅ Módulos de FORMADOR cargados');
 }
 
-/**
- * Inicializa módulos del rol 'admin'
- * Módulos: usuarios, contenido, métricas
- */
 async function initAdminModules(userId) {
   console.log('📦 Cargando módulos de ADMIN...');
-
   const usuariosModule = document.createElement('script');
   usuariosModule.src = 'modules/admin/usuarios.js';
   document.body.appendChild(usuariosModule);
