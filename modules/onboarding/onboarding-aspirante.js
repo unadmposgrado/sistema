@@ -1,135 +1,153 @@
 /**
  * modules/onboarding/onboarding-aspirante.js
  *
- * Módulo de onboarding para aspirantes
- * Campos: intereses, modalidad
+ * Onboarding para aspirantes
+ * Campos: nombre_completo, interes_academico, institucion
+ * Supone RLS DESACTIVADO (modo pruebas)
  */
 
-export async function renderOnboarding({ user, perfil, layoutContainer, supabase }) {
+export async function renderOnboarding({ user, layoutContainer, supabase }) {
   try {
-    // Validar parámetros requeridos
+    // ================================
+    // Validaciones mínimas
+    // ================================
     if (!user || !user.id) {
-      console.error('❌ usuario no válido');
-      layoutContainer.innerHTML = '<p style="color: red;">Error: Usuario no válido.</p>';
-      return;
-    }
-
-    // El perfil debería haber sido creado por index.js si no existía
-    // Pero validamos su existencia de todas formas
-    if (!perfil) {
-      console.error('❌ perfil no válido después de procesamiento');
-      layoutContainer.innerHTML = '<p style="color: red;">Error: No se pudo obtener perfil válido.</p>';
+      console.error('❌ Usuario no válido');
+      layoutContainer.innerHTML =
+        '<p style="color:red;">Error: usuario no válido.</p>';
       return;
     }
 
     if (!supabase) {
       console.error('❌ Supabase no disponible');
-      layoutContainer.innerHTML = '<p style="color: red;">Error: Base de datos no disponible.</p>';
+      layoutContainer.innerHTML =
+        '<p style="color:red;">Error: conexión a base de datos no disponible.</p>';
       return;
     }
 
     const userId = user.id;
 
-  const html = `
-    <div class="onboarding-container">
-      <h1>Completa tu perfil</h1>
-      <p>Necesitamos información adicional para personalizar tu experiencia.</p>
+    // ================================
+    // Render HTML
+    // ================================
+    layoutContainer.innerHTML = `
+      <div class="onboarding-container">
+        <h1>Completa tu perfil</h1>
+        <p>Cuéntanos un poco más para continuar.</p>
 
-      <form id="onboardingForm" aria-label="Formulario de onboarding para aspirantes">
-        <div class="form-group">
-          <label for="intereses">Intereses principales *</label>
-          <textarea id="intereses" name="intereses" required placeholder="Describe tus áreas de interés..."></textarea>
-        </div>
+        <form id="onboardingForm">
+          <div class="form-group">
+            <label for="interes">Área de interés *</label>
+            <input
+              type="text"
+              id="interes"
+              name="interes"
+              required
+              placeholder="Ej. Ciencias Sociales, Ingeniería, Artes..."
+            />
+          </div>
 
-        <div class="form-group">
-          <label for="modalidad">Modalidad preferida *</label>
-          <select id="modalidad" name="modalidad" required>
-            <option value="">Selecciona una modalidad...</option>
-            <option value="presencial">Presencial</option>
-            <option value="virtual">Virtual</option>
-            <option value="hibrida">Híbrida</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="institucion">Institución de procedencia</label>
+            <input
+              type="text"
+              id="institucion"
+              name="institucion"
+              placeholder="Escuela o institución actual"
+            />
+          </div>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Completar Onboarding</button>
-          <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
-        </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              Completar onboarding
+            </button>
+            <button type="button" id="cancelBtn" class="btn btn-secondary">
+              Cancelar
+            </button>
+          </div>
 
-        <div id="formError" class="form-error"></div>
-      </form>
-    </div>
-  `;
+          <div id="formError" class="form-error"></div>
+        </form>
+      </div>
+    `;
 
-  layoutContainer.innerHTML = html;
+    // ================================
+    // Referencias DOM
+    // ================================
+    const form = layoutContainer.querySelector('#onboardingForm');
+    const cancelBtn = layoutContainer.querySelector('#cancelBtn');
+    const formError = layoutContainer.querySelector('#formError');
+    const submitBtn = form.querySelector('button[type="submit"]');
 
-  const form = layoutContainer.querySelector('#onboardingForm');
-  const cancelBtn = layoutContainer.querySelector('#cancelBtn');
-  const formError = layoutContainer.querySelector('#formError');
+    // ================================
+    // Submit
+    // ================================
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  // Manejador de envío
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await handleFormSubmit(e, supabase, userId, formError);
-  });
+      formError.textContent = '';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Guardando...';
 
-  // Manejador de cancelar
-  cancelBtn.addEventListener('click', async () => {
-    try {
-      await supabase.auth.signOut();
-      window.location.href = 'index.html';
-    } catch (err) {
-      console.error('❌ Error en logout:', err);
-      formError.textContent = 'Error al cerrar sesión.';
-    }
-  });
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      if (!data.interes) {
+        formError.textContent = 'El área de interés es obligatoria.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Completar onboarding';
+        return;
+      }
+
+      try {
+        const updateData = {
+          interes_academico: data.interes.trim(),
+          institucion: data.institucion?.trim() || null,
+          onboarding_completo: true
+        };
+
+        const { data: updated, error } = await supabase
+          .from('perfiles')
+          .update(updateData)
+          .eq('id', userId)
+          .select();
+
+        if (error || !updated || updated.length === 0) {
+          console.error('❌ Error actualizando perfil:', error);
+          formError.textContent =
+            'No se pudo actualizar el perfil. Intenta de nuevo.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Completar onboarding';
+          return;
+        }
+
+        console.log('✅ Onboarding de aspirante completado');
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        console.error('❌ Error inesperado en onboarding:', err);
+        formError.textContent = 'Error inesperado. Intenta nuevamente.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Completar onboarding';
+      }
+    });
+
+    // ================================
+    // Cancelar → logout
+    // ================================
+    cancelBtn.addEventListener('click', async () => {
+      try {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error('❌ Error al cerrar sesión:', err);
+        formError.textContent = 'Error al cerrar sesión.';
+      }
+    });
 
   } catch (err) {
-    console.error('❌ Error en renderOnboarding (aspirante):', err);
-    layoutContainer.innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
-  }
-}
-
-async function handleFormSubmit(e, supabase, userId, formError) {
-  const form = e.target;
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData);
-
-  // Validar campos obligatorios
-  if (!data.intereses || !data.modalidad) {
-    formError.textContent = 'Todos los campos son obligatorios.';
-    return;
-  }
-
-  try {
-    formError.textContent = '';
-
-    // Preparar datos para actualizar perfil
-    const updateData = {
-      intereses: data.intereses,
-      modalidad: data.modalidad,
-      onboarding_completo: true
-    };
-
-    // Actualizar perfil en Supabase
-    const { error } = await supabase
-      .from('perfiles')
-      .update(updateData)
-      .eq('id', userId);
-
-    if (error) {
-      console.error('❌ Error guardando onboarding:', error);
-      formError.textContent = 'Error al guardar los datos. Intenta de nuevo.';
-      return;
-    }
-
-    console.log('✅ Onboarding completado para aspirante');
-    
-    // Redirigir al dashboard normal
-    window.location.href = 'dashboard.html';
-
-  } catch (err) {
-    console.error('❌ Error en handleFormSubmit:', err);
-    formError.textContent = 'Error inesperado. Intenta de nuevo.';
+    console.error('❌ Error general en onboarding-aspirante:', err);
+    layoutContainer.innerHTML =
+      `<p style="color:red;">Error inesperado: ${err.message}</p>`;
   }
 }

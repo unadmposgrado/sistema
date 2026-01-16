@@ -5,23 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const nombreInput = document.getElementById('nombre');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
-  const edadInput = document.getElementById('edad');
-  const institucionInput = document.getElementById('institucion');
-  const gradoInput = document.getElementById('grado');
   const rolInput = document.getElementById('rol');
-  const matriculaContainer = document.getElementById('matricula-container');
-  const matriculaInput = document.getElementById('matricula');
-
-  // Mostrar/ocultar matrícula según rol
-  rolInput.addEventListener('change', () => {
-    if (rolInput.value === 'estudiante') {
-      matriculaContainer.style.display = 'block';
-      matriculaInput.required = true;
-    } else {
-      matriculaContainer.style.display = 'none';
-      matriculaInput.required = false;
-    }
-  });
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -29,51 +14,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombre = nombreInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
-    const edad = parseInt(edadInput.value) || null;
-    const institucion = institucionInput.value.trim() || null;
-    const grado = gradoInput.value.trim() || null;
-    const rol = rolInput.value || 'aspirante';
-    const matricula = rol === 'estudiante' ? matriculaInput.value.trim() : null;
+    const rol = rolInput?.value || 'aspirante';
 
     if (!nombre || !email || !password) {
       alert('Nombre, correo y contraseña son obligatorios.');
       return;
     }
 
+    if (password.length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registrando...';
+
     try {
-      // 1️⃣ Crear usuario en Authentication
-      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: { shouldCreateUser: true }
+        options: {
+          data: {
+            nombre,
+            rol
+          }
+        }
       });
-      if (authError) throw authError;
 
-      // 2️⃣ Guardar datos extra en tabla perfiles
-      const { data, error } = await supabaseClient
-        .from('perfiles')
-        .upsert([{
-          id: authData.user.id,
-          nombre,
-          email,
-          edad,
-          institucion,
-          grado,
-          rol,
-          matricula
-        }])
-        .select();
       if (error) throw error;
 
-      alert('Registro exitoso. ¡Bienvenido! Por favor revisa tu correo y después inicia sesión.');
-      form.reset();
+      alert(
+        'Registro exitoso.\n\n' +
+        '1️⃣ Revisa tu correo para confirmar tu cuenta.\n' +
+        '2️⃣ Luego inicia sesión.\n' +
+        '3️⃣ Completa tu perfil en el primer acceso.'
+      );
 
-      // Redirigir a login
+      form.reset();
       window.location.href = 'login.html';
 
     } catch (err) {
-      console.error('Error al registrar usuario:', err);
-      alert(err.message || 'Ocurrió un error al registrar tus datos.');
+      console.error('❌ Error al registrar usuario:', err);
+
+      let message = 'Ocurrió un error al registrar.';
+      if (err.message?.includes('User already registered')) {
+        message = 'Este correo ya está registrado.';
+      }
+
+      alert(message);
+
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Registrarse';
     }
   });
 });
