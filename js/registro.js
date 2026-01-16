@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.textContent = 'Registrando...';
 
     try {
+      // Paso 1: Registrar usuario en Supabase Auth
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
@@ -42,6 +43,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (error) throw error;
+
+      // Paso 2: Insertar perfil en tabla 'perfiles'
+      const userId = data.user.id;
+      const { error: profileError } = await supabaseClient
+        .from('perfiles')
+        .insert([
+          {
+            id: userId,
+            nombre,
+            email,
+            rol
+          }
+        ]);
+
+      if (profileError) {
+        console.error('❌ Error al insertar perfil:', profileError);
+        alert('Aviso: El usuario fue registrado pero hubo un error al guardar el perfil. Por favor contacta al administrador.');
+        throw profileError;
+      }
 
       alert(
         'Registro exitoso.\n\n' +
