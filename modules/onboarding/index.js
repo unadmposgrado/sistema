@@ -15,7 +15,7 @@
  */
 export async function startOnboarding({ user, perfil }) {
   try {
-    console.log('🎯 startOnboarding iniciado para rol:', perfil.rol);
+    console.log('🎯 startOnboarding iniciado para usuario:', user?.id);
 
     // Validar que Supabase esté disponible
     if (!window.supabaseClient) {
@@ -27,9 +27,86 @@ export async function startOnboarding({ user, perfil }) {
       return;
     }
 
-    const userRole = perfil.rol || 'aspirante';
-    const layoutContainer = document.getElementById('layout-container');
+    // Validar usuario
+    if (!user || !user.id) {
+      console.error('❌ Usuario no válido');
+      const layoutContainer = document.getElementById('layout-container');
+      if (layoutContainer) {
+        layoutContainer.innerHTML = '<p style="color: red;">Error: Usuario no válido.</p>';
+      }
+      return;
+    }
 
+    const userId = user.id;
+    const supabase = window.supabaseClient;
+
+    // Obtener o crear perfil
+    let userPerfil = perfil;
+    
+    if (!userPerfil) {
+      console.log('📝 Perfil no proporcionado. Buscando en BD...');
+      
+      const { data: existingPerfil, error: searchError } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        // Error distinto a "no rows found"
+        console.error('❌ Error buscando perfil:', searchError);
+        const layoutContainer = document.getElementById('layout-container');
+        if (layoutContainer) {
+          layoutContainer.innerHTML = '<p style="color: red;">Error al acceder a la base de datos.</p>';
+        }
+        return;
+      }
+
+      if (!existingPerfil) {
+        // Perfil no existe, crearlo
+        console.log('📝 Perfil no existe. Creando uno nuevo...');
+        
+        const { data: newPerfil, error: createError } = await supabase
+          .from('perfiles')
+          .insert([{
+            id: userId,
+            rol: 'aspirante', // rol por defecto
+            onboarding_completo: false
+          }])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('❌ Error creando perfil:', createError);
+          const layoutContainer = document.getElementById('layout-container');
+          if (layoutContainer) {
+            layoutContainer.innerHTML = '<p style="color: red;">Error al crear el perfil.</p>';
+          }
+          return;
+        }
+
+        userPerfil = newPerfil;
+        console.log('✅ Perfil creado:', userPerfil);
+      } else {
+        userPerfil = existingPerfil;
+        console.log('✅ Perfil encontrado:', userPerfil);
+      }
+    }
+
+    // Validar que ahora tenemos perfil válido
+    if (!userPerfil || !userPerfil.id) {
+      console.error('❌ No se pudo obtener/crear perfil válido');
+      const layoutContainer = document.getElementById('layout-container');
+      if (layoutContainer) {
+        layoutContainer.innerHTML = '<p style="color: red;">Error: No se pudo obtener perfil válido.</p>';
+      }
+      return;
+    }
+
+    const userRole = userPerfil.rol || 'aspirante';
+    console.log('🎭 Rol del usuario:', userRole);
+
+    const layoutContainer = document.getElementById('layout-container');
     if (!layoutContainer) {
       console.error('❌ #layout-container no encontrado');
       return;
@@ -50,7 +127,7 @@ export async function startOnboarding({ user, perfil }) {
         break;
       default:
         console.error('❌ Rol desconocido:', userRole);
-        layoutContainer.innerHTML = '<p>Error: rol no reconocido.</p>';
+        layoutContainer.innerHTML = '<p style="color: red;">Error: rol no reconocido.</p>';
         return;
     }
 
@@ -61,20 +138,20 @@ export async function startOnboarding({ user, perfil }) {
     if (onboardingModule.renderOnboarding) {
       await onboardingModule.renderOnboarding({
         user,
-        perfil,
+        perfil: userPerfil,
         layoutContainer,
-        supabase: window.supabaseClient
+        supabase
       });
     } else {
       console.error('❌ El módulo no exporta renderOnboarding');
-      layoutContainer.innerHTML = '<p>Error en el módulo de onboarding.</p>';
+      layoutContainer.innerHTML = '<p style="color: red;">Error en el módulo de onboarding.</p>';
     }
 
   } catch (err) {
     console.error('❌ Error en startOnboarding:', err);
     const layoutContainer = document.getElementById('layout-container');
     if (layoutContainer) {
-      layoutContainer.innerHTML = `<p>Error: ${err.message}</p>`;
+      layoutContainer.innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
     }
   }
 }

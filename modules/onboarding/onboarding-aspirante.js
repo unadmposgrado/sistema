@@ -14,9 +14,11 @@ export async function renderOnboarding({ user, perfil, layoutContainer, supabase
       return;
     }
 
-    if (!perfil || !perfil.id) {
-      console.error('❌ perfil no válido');
-      layoutContainer.innerHTML = '<p style="color: red;">Error: Perfil no válido.</p>';
+    // El perfil debería haber sido creado por index.js si no existía
+    // Pero validamos su existencia de todas formas
+    if (!perfil) {
+      console.error('❌ perfil no válido después de procesamiento');
+      layoutContainer.innerHTML = '<p style="color: red;">Error: No se pudo obtener perfil válido.</p>';
       return;
     }
 

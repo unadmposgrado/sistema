@@ -47,15 +47,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       .eq('id', userId)
       .single();
 
-    if (perfilError || !perfil) {
-      console.error('❌ Error obteniendo rol:', perfilError);
-      alert('No se pudo determinar tu tipo de usuario.');
+    // Permitir que el onboarding maneje perfiles inexistentes
+    // (los creará automáticamente)
+    if (perfilError && perfilError.code !== 'PGRST116') {
+      // Error distinto a "no rows found"
+      console.error('❌ Error obteniendo perfil:', perfilError);
+      alert('No se pudo acceder a los datos del usuario.');
       window.location.href = 'login.html';
       return;
     }
 
-    const userRole = perfil.rol || 'aspirante';
-    const onboardingCompleto = perfil.onboarding_completo || false;
+    const userRole = perfil?.rol || 'aspirante';
+    const onboardingCompleto = perfil?.onboarding_completo || false;
     console.log('🎭 Rol del usuario:', userRole);
     console.log('✅ Onboarding completado:', onboardingCompleto);
 
