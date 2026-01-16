@@ -93,7 +93,7 @@ dashboard.html
 <script src="js/dashboard.js"></script>  [Orquestador central]
    ↓
 1. Validar sesión de usuario
-2. Obtener rol de Supabase (perfiles.role)
+2. Obtener rol de Supabase (perfiles.rol)
 3. Cargar layout dinámicamente (layouts/{role}.html)
 4. Cargar CSS específico (css/{role}.css)
 5. Inicializar módulos del rol

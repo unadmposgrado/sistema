@@ -281,7 +281,7 @@ console.log(SYSTEM_CONFIG.roles);
 ```javascript
 import { isRoleEnabled, getRoleStatusMessage } from './config.js';
 
-const userRole = perfil.role; // 'estudiante'
+const userRole = perfil.rol; // 'estudiante'
 
 if (!isRoleEnabled(userRole)) {
   layoutContainer.innerHTML = `

@@ -207,10 +207,10 @@ window.supabaseClient.auth.getSession()
 const { data: { session } } = await window.supabaseClient.auth.getSession();
 const { data: perfil } = await window.supabaseClient
   .from('perfiles')
-  .select('role')
+  .select('rol')
   .eq('id', session.user.id)
   .single();
-console.log(perfil.role);  // Debería mostrar el rol
+console.log(perfil.rol);  // Debería mostrar el rol
 ```
 
 ## 🆕 Agregar Nuevo Rol (Pasos Rápidos)
@@ -255,7 +255,7 @@ if (role === 'mi-rol') {
 
 ### 6. Actualizar BD
 ```sql
-UPDATE perfiles SET role = 'mi-rol' WHERE email = 'usuario@example.com';
+UPDATE perfiles SET rol = 'mi-rol' WHERE email = 'usuario@example.com';
 ```
 
 ## 💾 Migrando Código Antiguo

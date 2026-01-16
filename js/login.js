@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     try {
       const { data: perfil, error } = await window.supabaseClient
         .from('perfiles')
-        .select('role')
+        .select('rol')
         .eq('id', userId)
         .single();
 
@@ -115,13 +115,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       // ✅ NUEVA ARQUITECTURA: Todos los roles usan dashboard.html
       // El orquestador (dashboard.js) carga el layout correspondiente
-      if (perfil.role === 'aspirante') {
+      if (perfil.rol === 'aspirante') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
-      } else if (perfil.role === 'estudiante') {
+      } else if (perfil.rol === 'estudiante') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
-      } else if (perfil.role === 'formador') {
+      } else if (perfil.rol === 'formador') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
-      } else if (perfil.role === 'admin') {
+      } else if (perfil.rol === 'admin') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else {
         // Fallback seguro

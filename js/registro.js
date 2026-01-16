@@ -8,13 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const edadInput = document.getElementById('edad');
   const institucionInput = document.getElementById('institucion');
   const gradoInput = document.getElementById('grado');
-  const roleInput = document.getElementById('role');
+  const rolInput = document.getElementById('rol');
   const matriculaContainer = document.getElementById('matricula-container');
   const matriculaInput = document.getElementById('matricula');
 
   // Mostrar/ocultar matrícula según rol
-  roleInput.addEventListener('change', () => {
-    if (roleInput.value === 'estudiante') {
+  rolInput.addEventListener('change', () => {
+    if (rolInput.value === 'estudiante') {
       matriculaContainer.style.display = 'block';
       matriculaInput.required = true;
     } else {
@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const edad = parseInt(edadInput.value) || null;
     const institucion = institucionInput.value.trim() || null;
     const grado = gradoInput.value.trim() || null;
-    const role = roleInput.value || 'aspirante';
-    const matricula = role === 'estudiante' ? matriculaInput.value.trim() : null;
+    const rol = rolInput.value || 'aspirante';
+    const matricula = rol === 'estudiante' ? matriculaInput.value.trim() : null;
 
     if (!nombre || !email || !password) {
       alert('Nombre, correo y contraseña son obligatorios.');
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
           edad,
           institucion,
           grado,
-          role,
+          rol,
           matricula
         }])
         .select();

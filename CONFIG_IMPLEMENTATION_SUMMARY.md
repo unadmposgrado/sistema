@@ -96,7 +96,7 @@ SYSTEM_CONFIG
 
 ```javascript
 // ANTES ❌
-const userRole = perfil.role;
+const userRole = perfil.rol;
 // Cargar layout directamente
 
 // DESPUÉS ✅

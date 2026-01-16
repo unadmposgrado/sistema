@@ -4,7 +4,7 @@
  * Orquestador central del dashboard.
  * Responsabilidades:
  * - Validar sesión del usuario
- * - Detectar rol desde Supabase (perfiles.role)
+ * - Detectar rol desde Supabase (perfiles.rol)
  * - Validar estado del rol en config.js
  * - Cargar dinámicamente el layout correspondiente desde /layouts/
  * - Inicializar módulos JavaScript específicos del rol
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     const { data: perfil, error: perfilError } = await window.supabaseClient
       .from('perfiles')
-      .select('role')
+      .select('rol')
       .eq('id', userId)
       .single();
 
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const userRole = perfil.role || 'aspirante';
+    const userRole = perfil.rol || 'aspirante';
     console.log('🎭 Rol del usuario:', userRole);
 
     // ============================================================

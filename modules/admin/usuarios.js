@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: usuarios, error } = await supabase
         .from('perfiles')
-        .select('id, nombre, email, role')
+        .select('id, nombre, email, rol')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="user-info">
               <strong>${user.nombre}</strong>
               <small>${user.email}</small>
-              <span class="role-badge">${user.role}</span>
+              <span class="role-badge">${user.rol}</span>
             </div>
             <div class="user-actions">
               <button class="btn-secondary" data-user-id="${user.id}">Editar</button>
@@ -83,9 +83,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aspirants = document.getElementById('aspirants');
 
     if (totalUsers) totalUsers.textContent = usuarios.length;
-    if (activeStudents) activeStudents.textContent = usuarios.filter(u => u.role === 'estudiante').length;
-    if (trainers) trainers.textContent = usuarios.filter(u => u.role === 'formador').length;
-    if (aspirants) aspirants.textContent = usuarios.filter(u => u.role === 'aspirante').length;
+    if (activeStudents) activeStudents.textContent = usuarios.filter(u => u.rol === 'estudiante').length;
+    if (trainers) trainers.textContent = usuarios.filter(u => u.rol === 'formador').length;
+    if (aspirants) aspirants.textContent = usuarios.filter(u => u.rol === 'aspirante').length;
   }
 
   // Listener para agregar usuario

@@ -152,7 +152,7 @@ import {
 } from './config.js';
 
 async function initDashboard() {
-  const userRole = perfil.role;
+  const userRole = perfil.rol;
 
   // Verificar mantenimiento
   if (isSystemInMaintenance()) {
