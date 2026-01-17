@@ -101,16 +101,55 @@ document.addEventListener('DOMContentLoaded', async function () {
   ========================================================= */
   async function redirectByRole(userId) {
     try {
+      // Validación defensiva: verificar que userId exista
+      if (!userId) {
+        throw new Error('❌ Error crítico: No se pudo obtener el ID del usuario.');
+      }
+
+      // Consultar perfil con maybeSingle() para evitar error 406
       const { data: perfil, error } = await window.supabaseClient
         .from('perfiles')
-        .select('rol')
+        .select('rol, onboarding_completo')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error || !perfil) {
-        console.error('Error obteniendo rol:', error);
+      if (error) {
+        console.error('❌ Error obteniendo rol:', error);
         setError('No se pudo determinar el tipo de usuario.');
         return;
+      }
+
+      if (!perfil) {
+        console.error('❌ Perfil no encontrado para usuario:', userId);
+        setError('Tu perfil no está registrado. Contacta al administrador.');
+        return;
+      }
+
+      // 2️⃣ Si es estudiante sin onboarding, crear registro en tabla estudiantes
+      if (perfil.rol === 'estudiante' && perfil.onboarding_completo === false) {
+        const { data: estudianteExistente, error: errorVerificacion } = await window.supabaseClient
+          .from('estudiantes')
+          .select('perfil_id')
+          .eq('perfil_id', userId)
+          .maybeSingle();
+
+        if (errorVerificacion) {
+          console.warn('⚠️ Error verificando registro de estudiante:', errorVerificacion);
+        }
+
+        // Si no existe, insertar el registro
+        if (!estudianteExistente) {
+          const { error: errorInsercion } = await window.supabaseClient
+            .from('estudiantes')
+            .insert([{
+              perfil_id: userId
+            }]);
+
+          if (errorInsercion) {
+            console.warn('⚠️ Error creando registro en estudiantes:', errorInsercion);
+            // No interrumpimos el login si falla esta inserción
+          }
+        }
       }
 
       // ✅ NUEVA ARQUITECTURA: Todos los roles usan dashboard.html
@@ -129,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       }
 
     } catch (err) {
-      console.error('Error redirigiendo por rol:', err);
+      console.error('❌ Error redirigiendo por rol:', err);
       setError('Error al redirigir al dashboard.');
     }
   }
