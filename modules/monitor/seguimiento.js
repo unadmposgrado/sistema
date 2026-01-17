@@ -1,7 +1,7 @@
 /**
- * modules/aspirante/seguimiento.js
+ * modules/monitor/seguimiento.js
  *
- * Módulo para mostrar el seguimiento del estado de solicitud del aspirante.
+ * Módulo para mostrar el seguimiento del estado de solicitud del monitor.
  * Responsabilidades:
  * - Cargar información personal desde Supabase
  * - Mostrar estado actual de la solicitud
@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('📊 Módulo de SEGUIMIENTO inicializado');
 
   // ============================================================
-  // CARGAR DATOS DEL ASPIRANTE
+  // CARGAR DATOS DEL MONITOR
   // ============================================================
   try {
     const { data: perfil, error } = await supabase
       .from('perfiles')
-      .select('nombre, institucion, grado')
+      .select('nombre, institucion, interes_academico')
       .eq('id', userId)
       .single();
 
@@ -39,13 +39,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Poblar campos de información
     const welcomeName = document.getElementById('welcomeName');
     const institution = document.getElementById('institution');
-    const studyLevel = document.getElementById('studyLevel');
-    const academicDegree = document.getElementById('academicDegree');
+    const interestArea = document.getElementById('interestArea');
+    const academicInterest = document.getElementById('academicInterest');
 
     if (welcomeName) welcomeName.textContent = `Bienvenido, ${perfil.nombre}`;
     if (institution) institution.textContent = perfil.institucion || 'No especificada';
-    if (academicDegree) academicDegree.textContent = perfil.grado || 'No especificado';
-    if (studyLevel) studyLevel.textContent = 'Posgrado'; // Puedes hacerlo dinámico
+    if (academicInterest) academicInterest.textContent = perfil.interes_academico || 'No especificado';
+    if (interestArea) interestArea.textContent = perfil.interes_academico || 'Área no especificada';
 
     // ============================================================
     // MOSTRAR ESTADO DE SOLICITUD

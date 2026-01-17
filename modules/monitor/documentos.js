@@ -1,7 +1,7 @@
 /**
- * modules/aspirante/documentos.js
+ * modules/monitor/documentos.js
  *
- * Módulo para gestión de documentos del aspirante.
+ * Módulo para gestión de documentos del monitor.
  * Responsabilidades:
  * - Cargar documentos previamente subidos
  * - Gestionar subida de nuevos documentos a Supabase Storage
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: files, error } = await supabase
         .storage
-        .from('aspirantes')
+        .from('monitores')
         .list(userId);
 
       if (error) {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data, error } = await supabase
         .storage
-        .from('aspirantes')
+        .from('monitores')
         .download(`${userId}/${filename}`);
 
       if (error) throw error;
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const { error: uploadError } = await supabase
           .storage
-          .from('aspirantes')
+          .from('monitores')
           .upload(filePath, file, { upsert: true });
 
         if (uploadError) throw uploadError;

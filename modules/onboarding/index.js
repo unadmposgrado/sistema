@@ -101,7 +101,7 @@ export async function startOnboarding({ user, perfil }) {
       return;
     }
 
-    const userRole = userPerfil.rol || 'aspirante';
+    const userRole = userPerfil.rol || 'monitor';
     console.log('🎭 Rol del usuario:', userRole);
 
     const layoutContainer = document.getElementById('layout-container');
@@ -114,8 +114,8 @@ export async function startOnboarding({ user, perfil }) {
     let onboardingModule;
 
     switch (userRole) {
-      case 'aspirante':
-        onboardingModule = await import('./onboarding-aspirante.js');
+      case 'monitor':
+        onboardingModule = await import('./onboarding-monitor.js');
         break;
       case 'estudiante':
         onboardingModule = await import('./onboarding-estudiante.js');

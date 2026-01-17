@@ -2,8 +2,13 @@
  * modules/onboarding/onboarding-formador.js
  *
  * Onboarding para formadores
- * Campos: area_expertise, experiencia, institucion
- * Supone RLS DESACTIVADO (modo pruebas)
+ * Campos específicos guardados en tabla 'formadores':
+ * - perfil_id, area_expertise, experiencia, institucion
+ * 
+ * Flujo:
+ * 1. Verificar/crear registro en tabla 'formadores' (si no existe)
+ * 2. Guardar datos del formulario en tabla 'formadores'
+ * 3. Actualizar 'perfiles.onboarding_completo = true'
  */
 
 export async function renderOnboarding({ user, layoutContainer, supabase }) {
@@ -111,23 +116,68 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
       }
 
       try {
-        const updateData = {
-          area_expertise: data.area.trim(),
-          experiencia: parseInt(data.experiencia, 10),
-          institucion: data.institucion?.trim() || null,
-          onboarding_completo: true
-        };
+        // Paso 1: Verificar si existe registro en tabla 'formadores'
+        const { data: formadorExistente, error: errorVerificacion } = await supabase
+          .from('formadores')
+          .select('perfil_id')
+          .eq('perfil_id', userId)
+          .maybeSingle();
 
-        const { data: updated, error } = await supabase
+        if (errorVerificacion) {
+          console.error('❌ Error verificando registro en formadores:', errorVerificacion);
+          formError.textContent = 'Error al verificar datos. Intenta de nuevo.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Completar onboarding';
+          return;
+        }
+
+        // Paso 2: Si no existe, crear el registro en 'formadores'
+        if (!formadorExistente) {
+          const { error: errorCreacion } = await supabase
+            .from('formadores')
+            .insert([{
+              perfil_id: userId,
+              area_expertise: data.area.trim(),
+              experiencia: parseInt(data.experiencia, 10),
+              institucion: data.institucion?.trim() || null
+            }]);
+
+          if (errorCreacion) {
+            console.error('❌ Error creando registro en formadores:', errorCreacion);
+            formError.textContent = 'Error al guardar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        } else {
+          // Paso 2B: Si existe, actualizar datos en 'formadores'
+          const { error: errorActualizacion } = await supabase
+            .from('formadores')
+            .update({
+              area_expertise: data.area.trim(),
+              experiencia: parseInt(data.experiencia, 10),
+              institucion: data.institucion?.trim() || null
+            })
+            .eq('perfil_id', userId);
+
+          if (errorActualizacion) {
+            console.error('❌ Error actualizando registro en formadores:', errorActualizacion);
+            formError.textContent = 'Error al actualizar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        }
+
+        // Paso 3: Actualizar 'perfiles.onboarding_completo = true' (operación SEPARADA)
+        const { error: errorPerfil } = await supabase
           .from('perfiles')
-          .update(updateData)
-          .eq('id', userId)
-          .select();
+          .update({ onboarding_completo: true })
+          .eq('id', userId);
 
-        if (error || !updated || updated.length === 0) {
-          console.error('❌ Error actualizando perfil:', error);
-          formError.textContent =
-            'No se pudo actualizar el perfil. Intenta de nuevo.';
+        if (errorPerfil) {
+          console.error('❌ Error actualizando onboarding_completo:', errorPerfil);
+          formError.textContent = 'Error al finalizar. Por favor contacta al administrador.';
           submitBtn.disabled = false;
           submitBtn.textContent = 'Completar onboarding';
           return;

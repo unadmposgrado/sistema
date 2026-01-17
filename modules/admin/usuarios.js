@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const totalUsers = document.getElementById('totalUsers');
     const activeStudents = document.getElementById('activeStudents');
     const trainers = document.getElementById('trainers');
-    const aspirants = document.getElementById('aspirants');
+    const monitors = document.getElementById('monitors');
 
     if (totalUsers) totalUsers.textContent = usuarios.length;
     if (activeStudents) activeStudents.textContent = usuarios.filter(u => u.rol === 'estudiante').length;
     if (trainers) trainers.textContent = usuarios.filter(u => u.rol === 'formador').length;
-    if (aspirants) aspirants.textContent = usuarios.filter(u => u.rol === 'aspirante').length;
+    if (monitors) monitors.textContent = usuarios.filter(u => u.rol === 'monitor').length;
   }
 
   // Listener para agregar usuario

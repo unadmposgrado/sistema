@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       // ✅ NUEVA ARQUITECTURA: Todos los roles usan dashboard.html
       // El orquestador (dashboard.js) carga el layout correspondiente
-      if (perfil.rol === 'aspirante') {
+      if (perfil.rol === 'monitor') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else if (perfil.rol === 'estudiante') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico

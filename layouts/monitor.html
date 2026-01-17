@@ -1,19 +1,19 @@
-<!-- layouts/aspirante.html
-     Layout del rol ASPIRANTE
+<!-- layouts/monitor.html
+     Layout del rol MONITOR
      Contiene secciones para: información personal, documentos, estado de solicitud
 -->
 
 <div class="container">
   <!-- Bienvenida -->
-  <h1 class="student-name" id="welcomeName">Bienvenido, aspirante</h1>
+  <h1 class="student-name" id="welcomeName">Bienvenido, monitor</h1>
 
   <!-- Información personal -->
   <section class="info-section-group">
     <h2>Tu información</h2>
 
     <div class="info-section">
-      <div class="label">Nivel de estudios</div>
-      <div class="value" id="studyLevel">Por definir</div>
+      <div class="label">Área de interés</div>
+      <div class="value" id="interestArea">Por definir</div>
     </div>
 
     <div class="info-section">
@@ -22,8 +22,8 @@
     </div>
 
     <div class="info-section">
-      <div class="label">Grado académico</div>
-      <div class="value" id="academicDegree">No especificado</div>
+      <div class="label">Interés académico</div>
+      <div class="value" id="academicInterest">No especificado</div>
     </div>
   </section>
 
@@ -52,7 +52,7 @@
       <!-- Carta de motivos -->
       <div class="upload-card" data-type="carta">
         <h3>Carta de exposición de motivos</h3>
-        <p class="card-description">Explica por qué deseas ingresar a nuestro programa.</p>
+        <p class="card-description">Explica por qué deseas ser monitor en nuestro programa.</p>
         <input type="file" accept=".pdf,.doc,.docx" aria-label="Seleccionar carta de motivos">
         <div class="actions">
           <button class="btn-primary upload-btn">Cargar</button>
@@ -73,9 +73,9 @@
 
       <!-- Anteproyecto -->
       <div class="upload-card" data-type="anteproyecto">
-        <h3>Anteproyecto de investigación</h3>
-        <p class="card-description">Propuesta de tu tema de investigación o trabajo final.</p>
-        <input type="file" accept=".pdf,.doc,.docx" aria-label="Seleccionar anteproyecto">
+        <h3>Propuesta de participación</h3>
+        <p class="card-description">Tu propuesta de cómo contribuirías como monitor.</p>
+        <input type="file" accept=".pdf,.doc,.docx" aria-label="Seleccionar propuesta">
         <div class="actions">
           <button class="btn-primary upload-btn">Cargar</button>
           <button class="btn-secondary cancel-btn">Cancelar</button>

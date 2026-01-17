@@ -2,8 +2,13 @@
  * modules/onboarding/onboarding-estudiante.js
  *
  * Onboarding para estudiantes
- * Campos: matricula, grado, institucion
- * Supone RLS DESACTIVADO (modo pruebas)
+ * Campos específicos guardados en tabla 'estudiantes':
+ * - perfil_id, matricula, grado, institucion
+ * 
+ * Flujo:
+ * 1. Verificar/crear registro en tabla 'estudiantes' (si no existe)
+ * 2. Guardar datos del formulario en tabla 'estudiantes'
+ * 3. Actualizar 'perfiles.onboarding_completo = true'
  */
 
 export async function renderOnboarding({ user, layoutContainer, supabase }) {
@@ -112,23 +117,68 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
       }
 
       try {
-        const updateData = {
-          matricula: data.matricula.trim(),
-          grado: data.grado,
-          institucion: data.institucion.trim(),
-          onboarding_completo: true
-        };
+        // Paso 1: Verificar si existe registro en tabla 'estudiantes'
+        const { data: estudianteExistente, error: errorVerificacion } = await supabase
+          .from('estudiantes')
+          .select('perfil_id')
+          .eq('perfil_id', userId)
+          .maybeSingle();
 
-        const { data: updated, error } = await supabase
+        if (errorVerificacion) {
+          console.error('❌ Error verificando registro en estudiantes:', errorVerificacion);
+          formError.textContent = 'Error al verificar datos. Intenta de nuevo.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Completar onboarding';
+          return;
+        }
+
+        // Paso 2: Si no existe, crear el registro en 'estudiantes'
+        if (!estudianteExistente) {
+          const { error: errorCreacion } = await supabase
+            .from('estudiantes')
+            .insert([{
+              perfil_id: userId,
+              matricula: data.matricula.trim(),
+              grado: data.grado,
+              institucion: data.institucion.trim()
+            }]);
+
+          if (errorCreacion) {
+            console.error('❌ Error creando registro en estudiantes:', errorCreacion);
+            formError.textContent = 'Error al guardar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        } else {
+          // Paso 2B: Si existe, actualizar datos en 'estudiantes'
+          const { error: errorActualizacion } = await supabase
+            .from('estudiantes')
+            .update({
+              matricula: data.matricula.trim(),
+              grado: data.grado,
+              institucion: data.institucion.trim()
+            })
+            .eq('perfil_id', userId);
+
+          if (errorActualizacion) {
+            console.error('❌ Error actualizando registro en estudiantes:', errorActualizacion);
+            formError.textContent = 'Error al actualizar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        }
+
+        // Paso 3: Actualizar 'perfiles.onboarding_completo = true' (operación SEPARADA)
+        const { error: errorPerfil } = await supabase
           .from('perfiles')
-          .update(updateData)
-          .eq('id', userId)
-          .select();
+          .update({ onboarding_completo: true })
+          .eq('id', userId);
 
-        if (error || !updated || updated.length === 0) {
-          console.error('❌ Error actualizando perfil:', error);
-          formError.textContent =
-            'No se pudo actualizar el perfil. Intenta de nuevo.';
+        if (errorPerfil) {
+          console.error('❌ Error actualizando onboarding_completo:', errorPerfil);
+          formError.textContent = 'Error al finalizar. Por favor contacta al administrador.';
           submitBtn.disabled = false;
           submitBtn.textContent = 'Completar onboarding';
           return;

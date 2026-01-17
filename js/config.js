@@ -36,10 +36,10 @@ const SYSTEM_CONFIG = {
 
   // Configuración por rol
   roles: {
-    aspirante: {
+    monitor: {
       enabled: true,
       status: 'active', // 'active', 'disabled', 'paused'
-      label: 'Aspirante',
+      label: 'Monitor',
       description: 'Usuarios en proceso de candidatura',
       visibleInNav: true,
       allowedActions: {
@@ -48,8 +48,8 @@ const SYSTEM_CONFIG = {
         uploadDocuments: true,
       },
       messages: {
-        disabled: 'El rol de aspirante está temporalmente deshabilitado.',
-        paused: 'El rol de aspirante está pausado por mantenimiento.',
+        disabled: 'El rol de monitor está temporalmente deshabilitado.',
+        paused: 'El rol de monitor está pausado por mantenimiento.',
       },
     },
 
@@ -125,7 +125,7 @@ const SYSTEM_CONFIG = {
 /**
  * Lista de roles válidos del sistema
  */
-export const ROLES = Object.freeze(['aspirante', 'estudiante', 'formador', 'admin']);
+export const ROLES = Object.freeze(['monitor', 'estudiante', 'formador', 'admin']);
 
 /**
  * Estados válidos de un rol
@@ -142,7 +142,7 @@ export const ROLE_STATES = Object.freeze({
 
 /**
  * Obtiene la configuración completa de un rol
- * @param {string} roleName - Nombre del rol ('aspirante', 'estudiante', etc.)
+ * @param {string} roleName - Nombre del rol ('monitor', 'estudiante', etc.)
  * @returns {Object} Configuración del rol o null si no existe
  */
 export function getRoleConfig(roleName) {

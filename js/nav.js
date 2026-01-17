@@ -39,7 +39,7 @@
         return;
       }
 
-      const role = perfil?.rol || 'aspirante';
+      const role = perfil?.rol || 'monitor';
 
       const profileMenu = placeholder.querySelector('.profile-menu');
       const profileBtn = placeholder.querySelector('.profile-btn');
@@ -49,7 +49,7 @@
       // 🧱 Construcción del menú por rol
       let menuHTML = '';
 
-      if (role === 'aspirante') {
+      if (role === 'monitor') {
         menuHTML = `
           <a href="dashboard.html" role="menuitem">Inicio</a>
           <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>

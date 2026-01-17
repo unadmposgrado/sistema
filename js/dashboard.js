@@ -10,7 +10,7 @@
  * - Inicializar módulos JavaScript específicos del rol
  * - Manejar cierre de sesión
  *
- * Roles soportados: 'aspirante', 'estudiante', 'formador', 'admin'
+ * Roles soportados: 'monitor', 'estudiante', 'formador', 'admin'
  */
 
 // Importar configuración centralizada
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const userRole = perfil?.rol || 'aspirante';
+    const userRole = perfil?.rol || 'monitor';
     const onboardingCompleto = perfil?.onboarding_completo || false;
     console.log('🎭 Rol del usuario:', userRole);
     console.log('✅ Onboarding completado:', onboardingCompleto);
@@ -202,8 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log(`📦 Inicializando módulos para rol: ${userRole}`);
 
     switch (userRole) {
-      case 'aspirante':
-        await initAspiranteModules(userId);
+      case 'monitor':
+        await initMonitorModules(userId);
         break;
       case 'estudiante':
         await initEstudianteModules(userId);
@@ -231,17 +231,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 // (sin cambios respecto a tu versión original)
 // ============================================================
 
-async function initAspiranteModules(userId) {
-  console.log('📦 Cargando módulos de ASPIRANTE...');
+async function initMonitorModules(userId) {
+  console.log('📦 Cargando módulos de MONITOR...');
   const documentsModule = document.createElement('script');
-  documentsModule.src = 'modules/aspirante/documentos.js';
+  documentsModule.src = 'modules/monitor/documentos.js';
   document.body.appendChild(documentsModule);
 
   const trackingModule = document.createElement('script');
-  trackingModule.src = 'modules/aspirante/seguimiento.js';
+  trackingModule.src = 'modules/monitor/seguimiento.js';
   document.body.appendChild(trackingModule);
 
-  console.log('✅ Módulos de ASPIRANTE cargados');
+  console.log('✅ Módulos de MONITOR cargados');
 }
 
 async function initEstudianteModules(userId) {

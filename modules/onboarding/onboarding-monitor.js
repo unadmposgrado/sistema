@@ -1,9 +1,14 @@
 /**
- * modules/onboarding/onboarding-aspirante.js
+ * modules/onboarding/onboarding-monitor.js
  *
- * Onboarding para aspirantes
- * Campos: nombre_completo, interes_academico, institucion
- * Supone RLS DESACTIVADO (modo pruebas)
+ * Onboarding para monitores (antes llamados aspirantes)
+ * Campos específicos guardados en tabla 'monitores':
+ * - perfil_id, interes_academico, institucion
+ * 
+ * Flujo:
+ * 1. Verificar/crear registro en tabla 'monitores' (si no existe)
+ * 2. Guardar datos del formulario en tabla 'monitores'
+ * 3. Actualizar 'perfiles.onboarding_completo = true'
  */
 
 export async function renderOnboarding({ user, layoutContainer, supabase }) {
@@ -100,28 +105,72 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
       }
 
       try {
-        const updateData = {
-          interes_academico: data.interes.trim(),
-          institucion: data.institucion?.trim() || null,
-          onboarding_completo: true
-        };
+        // Paso 1: Verificar si existe registro en tabla 'monitores'
+        const { data: monitorExistente, error: errorVerificacion } = await supabase
+          .from('monitores')
+          .select('perfil_id')
+          .eq('perfil_id', userId)
+          .maybeSingle();
 
-        const { data: updated, error } = await supabase
-          .from('perfiles')
-          .update(updateData)
-          .eq('id', userId)
-          .select();
-
-        if (error || !updated || updated.length === 0) {
-          console.error('❌ Error actualizando perfil:', error);
-          formError.textContent =
-            'No se pudo actualizar el perfil. Intenta de nuevo.';
+        if (errorVerificacion) {
+          console.error('❌ Error verificando registro en monitores:', errorVerificacion);
+          formError.textContent = 'Error al verificar datos. Intenta de nuevo.';
           submitBtn.disabled = false;
           submitBtn.textContent = 'Completar onboarding';
           return;
         }
 
-        console.log('✅ Onboarding de aspirante completado');
+        // Paso 2: Si no existe, crear el registro en 'monitores'
+        if (!monitorExistente) {
+          const { error: errorCreacion } = await supabase
+            .from('monitores')
+            .insert([{
+              perfil_id: userId,
+              interes_academico: data.interes.trim(),
+              institucion: data.institucion?.trim() || null
+            }]);
+
+          if (errorCreacion) {
+            console.error('❌ Error creando registro en monitores:', errorCreacion);
+            formError.textContent = 'Error al guardar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        } else {
+          // Paso 2B: Si existe, actualizar datos en 'monitores'
+          const { error: errorActualizacion } = await supabase
+            .from('monitores')
+            .update({
+              interes_academico: data.interes.trim(),
+              institucion: data.institucion?.trim() || null
+            })
+            .eq('perfil_id', userId);
+
+          if (errorActualizacion) {
+            console.error('❌ Error actualizando registro en monitores:', errorActualizacion);
+            formError.textContent = 'Error al actualizar datos. Intenta de nuevo.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Completar onboarding';
+            return;
+          }
+        }
+
+        // Paso 3: Actualizar 'perfiles.onboarding_completo = true' (operación SEPARADA)
+        const { error: errorPerfil } = await supabase
+          .from('perfiles')
+          .update({ onboarding_completo: true })
+          .eq('id', userId);
+
+        if (errorPerfil) {
+          console.error('❌ Error actualizando onboarding_completo:', errorPerfil);
+          formError.textContent = 'Error al finalizar. Por favor contacta al administrador.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Completar onboarding';
+          return;
+        }
+
+        console.log('✅ Onboarding de monitor completado');
         window.location.href = 'dashboard.html';
 
       } catch (err) {
@@ -146,7 +195,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
     });
 
   } catch (err) {
-    console.error('❌ Error general en onboarding-aspirante:', err);
+    console.error('❌ Error general en onboarding-monitor:', err);
     layoutContainer.innerHTML =
       `<p style="color:red;">Error inesperado: ${err.message}</p>`;
   }
