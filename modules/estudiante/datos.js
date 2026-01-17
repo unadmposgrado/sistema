@@ -1,11 +1,16 @@
-import { supabase } from '../../js/supabase.js';
+/**
+ * modules/estudiante/datos.js
+ * 
+ * Carga y pinta datos reales del estudiante desde Supabase
+ * Expone: window.cargarDatosEstudiante(userId)
+ */
 
-export async function cargarDatosEstudiante(userId) {
-  if (!userId) return;
+window.cargarDatosEstudiante = async function(userId) {
+  if (!userId || !window.supabaseClient) return;
 
   try {
     // 1. Obtener perfil
-    const { data: perfil, error: perfilError } = await supabase
+    const { data: perfil, error: perfilError } = await window.supabaseClient
       .from('perfiles')
       .select('nombre')
       .eq('id', userId)
@@ -17,7 +22,7 @@ export async function cargarDatosEstudiante(userId) {
     }
 
     // 2. Obtener datos de estudiante
-    const { data: estudiante, error: estudianteError } = await supabase
+    const { data: estudiante, error: estudianteError } = await window.supabaseClient
       .from('estudiantes')
       .select('matricula, grado')
       .eq('perfil_id', userId)
@@ -48,4 +53,4 @@ export async function cargarDatosEstudiante(userId) {
   } catch (err) {
     console.error('Error general cargando datos del estudiante:', err);
   }
-}
+};

@@ -21,8 +21,6 @@ import {
   getMaintenanceMessage,
 } from './config.js';
 
-import { cargarDatosEstudiante } from './modules/estudiante/datos.js';
-
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     console.log('🚀 Dashboard.js inicializando...');
@@ -247,9 +245,18 @@ async function initMonitorModules(userId) {
 }
 
 async function initEstudianteModules(userId) {
-  await cargarDatosEstudiante(userId);
-
   console.log('📦 Cargando módulos de ESTUDIANTE...');
+  
+  // Cargar datos del estudiante
+  const datosModule = document.createElement('script');
+  datosModule.src = 'modules/estudiante/datos.js';
+  datosModule.onload = () => {
+    if (window.cargarDatosEstudiante) {
+      window.cargarDatosEstudiante(userId);
+    }
+  };
+  document.body.appendChild(datosModule);
+
   const progressModule = document.createElement('script');
   progressModule.src = 'modules/estudiante/progreso.js';
   document.body.appendChild(progressModule);
