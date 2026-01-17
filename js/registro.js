@@ -48,20 +48,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (error) throw error;
 
-      // Paso 2: Insertar perfil en tabla 'perfiles'
+      // Paso 2: Validación defensiva de data.user
+      if (!data.user || !data.user.id) {
+        throw new Error('❌ Error crítico: No se pudo obtener el ID del usuario registrado.');
+      }
+
+      // Paso 3: Crear/actualizar perfil en tabla 'perfiles' usando upsert()
       const userId = data.user.id;
       const { error: profileError } = await supabaseClient
         .from('perfiles')
-        .insert([
+        .upsert([
           {
             id: userId,
             nombre,
-            email
+            email,
+            rol: 'estudiante',
+            onboarding_completo: false
           }
-        ]);
+        ], { onConflict: 'id' });
 
       if (profileError) {
-        console.error('❌ Error al insertar perfil:', profileError);
+        console.error('❌ Error al crear/actualizar perfil:', profileError);
         alert('Aviso: El usuario fue registrado pero hubo un error al guardar el perfil. Por favor contacta al administrador.');
         throw profileError;
       }
