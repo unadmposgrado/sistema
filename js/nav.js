@@ -63,7 +63,7 @@
         `;
       }
 
-      if (role === 'formador') {
+      if (role === 'facilitador') {
         menuHTML = `
           <a href="dashboard.html" role="menuitem">Inicio</a>
           <a href="#" id="logoutBtn" role="menuitem">Cerrar sesión</a>

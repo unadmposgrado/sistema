@@ -10,7 +10,7 @@
  * - Inicializar módulos JavaScript específicos del rol
  * - Manejar cierre de sesión
  *
- * Roles soportados: 'monitor', 'estudiante', 'formador', 'admin'
+ * Roles soportados: 'monitor', 'estudiante', 'facilitador', 'admin'
  */
 
 // Importar configuración centralizada
@@ -208,8 +208,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       case 'estudiante':
         await initEstudianteModules(userId);
         break;
-      case 'formador':
-        await initFormadorModules(userId);
+      case 'facilitador':
+        await initFacilitadorModules(userId);
         break;
       case 'admin':
         await initAdminModules(userId);
@@ -272,21 +272,21 @@ async function initEstudianteModules(userId) {
   console.log('✅ Módulos de ESTUDIANTE cargados');
 }
 
-async function initFormadorModules(userId) {
-  console.log('📦 Cargando módulos de FORMADOR...');
+async function initFacilitadorModules(userId) {
+  console.log('📦 Cargando módulos de FACILITADOR...');
   const gruposModule = document.createElement('script');
-  gruposModule.src = 'modules/formador/grupos.js';
+  gruposModule.src = 'modules/facilitador/grupos.js';
   document.body.appendChild(gruposModule);
 
   const evaluacionModule = document.createElement('script');
-  evaluacionModule.src = 'modules/formador/evaluacion.js';
+  evaluacionModule.src = 'modules/facilitador/evaluacion.js';
   document.body.appendChild(evaluacionModule);
 
   const reportesModule = document.createElement('script');
-  reportesModule.src = 'modules/formador/reportes.js';
+  reportesModule.src = 'modules/facilitador/reportes.js';
   document.body.appendChild(reportesModule);
 
-  console.log('✅ Módulos de FORMADOR cargados');
+  console.log('✅ Módulos de FACILITADOR cargados');
 }
 
 async function initAdminModules(userId) {

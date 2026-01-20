@@ -1,5 +1,5 @@
 /**
- * modules/formador/reportes.js
+ * modules/facilitador/reportes.js
  *
  * Módulo para generación de reportes y análisis.
  * Responsabilidades:

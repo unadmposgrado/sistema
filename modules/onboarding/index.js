@@ -120,8 +120,8 @@ export async function startOnboarding({ user, perfil }) {
       case 'estudiante':
         onboardingModule = await import('./onboarding-estudiante.js');
         break;
-      case 'formador':
-        onboardingModule = await import('./onboarding-formador.js');
+      case 'facilitador':
+        onboardingModule = await import('./onboarding-facilitador.js');
         break;
       default:
         console.error('❌ Rol desconocido:', userRole);

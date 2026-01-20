@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else if (perfil.rol === 'estudiante') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
-      } else if (perfil.rol === 'formador') {
+      } else if (perfil.rol === 'facilitador') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico
       } else if (perfil.rol === 'admin') {
         window.location.href = 'dashboard.html';  // Usa dashboard genérico

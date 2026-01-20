@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (totalUsers) totalUsers.textContent = usuarios.length;
     if (activeStudents) activeStudents.textContent = usuarios.filter(u => u.rol === 'estudiante').length;
-    if (trainers) trainers.textContent = usuarios.filter(u => u.rol === 'formador').length;
+    if (trainers) trainers.textContent = usuarios.filter(u => u.rol === 'facilitador').length;
     if (monitors) monitors.textContent = usuarios.filter(u => u.rol === 'monitor').length;
   }
 

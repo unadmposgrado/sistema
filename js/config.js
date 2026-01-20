@@ -71,10 +71,10 @@ const SYSTEM_CONFIG = {
       },
     },
 
-    formador: {
+    facilitador: {
       enabled: true,
       status: 'active',
-      label: 'Formador',
+      label: 'Facilitador',
       description: 'Docentes y tutores',
       visibleInNav: true,
       allowedActions: {
@@ -85,8 +85,8 @@ const SYSTEM_CONFIG = {
         generateReports: true,
       },
       messages: {
-        disabled: 'El rol de formador está temporalmente deshabilitado.',
-        paused: 'El rol de formador está pausado por mantenimiento.',
+        disabled: 'El rol de facilitador está temporalmente deshabilitado.',
+        paused: 'El rol de facilitador está pausado por mantenimiento.',
       },
     },
 
@@ -125,7 +125,7 @@ const SYSTEM_CONFIG = {
 /**
  * Lista de roles válidos del sistema
  */
-export const ROLES = Object.freeze(['monitor', 'estudiante', 'formador', 'admin']);
+export const ROLES = Object.freeze(['monitor', 'estudiante', 'facilitador', 'admin']);
 
 /**
  * Estados válidos de un rol

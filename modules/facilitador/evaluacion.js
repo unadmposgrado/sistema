@@ -1,5 +1,5 @@
 /**
- * modules/formador/evaluacion.js
+ * modules/facilitador/evaluacion.js
  *
  * Módulo para evaluación de estudiantes.
  * Responsabilidades:

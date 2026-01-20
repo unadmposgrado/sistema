@@ -1,7 +1,7 @@
 /**
  * modules/estudiante/retroalimentacion.js
  *
- * Módulo para mostrar retroalimentación del tutor/formador.
+ * Módulo para mostrar retroalimentación del tutor/facilitador.
  * Responsabilidades:
  * - Cargar feedback desde Supabase
  * - Mostrar retroalimentación pendiente

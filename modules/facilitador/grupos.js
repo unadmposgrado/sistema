@@ -1,9 +1,9 @@
 /**
- * modules/formador/grupos.js
+ * modules/facilitador/grupos.js
  *
- * Módulo para gestión de grupos del formador.
+ * Módulo para gestión de grupos del facilitador.
  * Responsabilidades:
- * - Listar grupos asignados al formador
+ * - Listar grupos asignados al facilitador
  * - Permitir filtrado y búsqueda
  * - Acceder a detalles de cada grupo
  */

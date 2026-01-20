@@ -1,13 +1,13 @@
 /**
- * modules/onboarding/onboarding-formador.js
+ * modules/onboarding/onboarding-facilitador.js
  *
- * Onboarding para formadores
- * Campos específicos guardados en tabla 'formadores':
+ * Onboarding para facilitadores
+ * Campos específicos guardados en tabla 'facilitadores':
  * - perfil_id, area_expertise, experiencia, institucion
  * 
  * Flujo:
- * 1. Verificar/crear registro en tabla 'formadores' (si no existe)
- * 2. Guardar datos del formulario en tabla 'formadores'
+ * 1. Verificar/crear registro en tabla 'facilitadores' (si no existe)
+ * 2. Guardar datos del formulario en tabla 'facilitadores'
  * 3. Actualizar 'perfiles.onboarding_completo = true'
  */
 
@@ -37,7 +37,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
     // ================================
     layoutContainer.innerHTML = `
       <div class="onboarding-container">
-        <h1>Perfil de formador</h1>
+        <h1>Perfil de facilitador</h1>
         <p>Necesitamos algunos datos profesionales.</p>
 
         <form id="onboardingForm">
@@ -116,25 +116,25 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
       }
 
       try {
-        // Paso 1: Verificar si existe registro en tabla 'formadores'
-        const { data: formadorExistente, error: errorVerificacion } = await supabase
-          .from('formadores')
+        // Paso 1: Verificar si existe registro en tabla 'facilitadores'
+        const { data: facilitadorExistente, error: errorVerificacion } = await supabase
+          .from('facilitadores')
           .select('perfil_id')
           .eq('perfil_id', userId)
           .maybeSingle();
 
         if (errorVerificacion) {
-          console.error('❌ Error verificando registro en formadores:', errorVerificacion);
+          console.error('❌ Error verificando registro en facilitadores:', errorVerificacion);
           formError.textContent = 'Error al verificar datos. Intenta de nuevo.';
           submitBtn.disabled = false;
           submitBtn.textContent = 'Completar onboarding';
           return;
         }
 
-        // Paso 2: Si no existe, crear el registro en 'formadores'
-        if (!formadorExistente) {
+        // Paso 2: Si no existe, crear el registro en 'facilitadores'
+        if (!facilitadorExistente) {
           const { error: errorCreacion } = await supabase
-            .from('formadores')
+            .from('facilitadores')
             .insert([{
               perfil_id: userId,
               area_expertise: data.area.trim(),
@@ -143,16 +143,16 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
             }]);
 
           if (errorCreacion) {
-            console.error('❌ Error creando registro en formadores:', errorCreacion);
+            console.error('❌ Error creando registro en facilitadores:', errorCreacion);
             formError.textContent = 'Error al guardar datos. Intenta de nuevo.';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Completar onboarding';
             return;
           }
         } else {
-          // Paso 2B: Si existe, actualizar datos en 'formadores'
+          // Paso 2B: Si existe, actualizar datos en 'facilitadores'
           const { error: errorActualizacion } = await supabase
-            .from('formadores')
+            .from('facilitadores')
             .update({
               area_expertise: data.area.trim(),
               experiencia: parseInt(data.experiencia, 10),
@@ -161,7 +161,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
             .eq('perfil_id', userId);
 
           if (errorActualizacion) {
-            console.error('❌ Error actualizando registro en formadores:', errorActualizacion);
+            console.error('❌ Error actualizando registro en facilitadores:', errorActualizacion);
             formError.textContent = 'Error al actualizar datos. Intenta de nuevo.';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Completar onboarding';
@@ -183,7 +183,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
           return;
         }
 
-        console.log('✅ Onboarding de formador completado');
+        console.log('✅ Onboarding de facilitador completado');
         window.location.href = 'dashboard.html';
 
       } catch (err) {
@@ -208,7 +208,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
     });
 
   } catch (err) {
-    console.error('❌ Error general en onboarding-formador:', err);
+    console.error('❌ Error general en onboarding-facilitador:', err);
     layoutContainer.innerHTML =
       `<p style="color:red;">Error inesperado: ${err.message}</p>`;
   }
