@@ -76,7 +76,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
 
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-              Completar onboarding
+              Completar información
             </button>
             <button type="button" id="cancelBtn" class="btn btn-secondary">
               Cancelar
