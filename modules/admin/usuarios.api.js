@@ -47,7 +47,6 @@ export async function cambiarRol(userId, nuevoRol) {
       .update({
         rol: nuevoRol,
         onboarding_completo: false, // Forzar reinicio de onboarding
-        updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
       .select('id, nombre, email, rol, onboarding_completo');
@@ -76,7 +75,6 @@ export async function resetearOnboarding(userId) {
       .from('perfiles')
       .update({
         onboarding_completo: false,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
       .select('id, nombre, email, rol, onboarding_completo');
