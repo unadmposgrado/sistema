@@ -61,8 +61,15 @@ function mostrarError(mensaje) {
  * Inicializar el módulo de usuarios
  * Se ejecuta cuando dashboard carga el rol admin
  */
-async function inicializarModuloUsuarios() {
+export async function inicializarModuloUsuarios() {
   console.log('📦 Inicializando módulo de usuarios admin...');
+
+  // Verificar que el contenedor existe
+  const usersList = document.getElementById('usersList');
+  if (!usersList) {
+    console.warn('⚠️ No se encontró #usersList. El módulo no se inicializará.');
+    return;
+  }
 
   try {
     // Mostrar estado de carga
@@ -95,13 +102,5 @@ async function inicializarModuloUsuarios() {
   }
 }
 
-// Esperar a que el DOM esté listo y ejecutar inicialización
-document.addEventListener('DOMContentLoaded', () => {
-  // Verificar que existe el contenedor de usuarios
-  const usersList = document.getElementById('usersList');
-  if (usersList) {
-    inicializarModuloUsuarios();
-  } else {
-    console.warn('⚠️ No se encontró #usersList. El módulo no se inicializará.');
-  }
-});
+// Hacer la función disponible globalmente para dashboard.js
+window.inicializarModuloUsuarios = inicializarModuloUsuarios;

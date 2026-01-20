@@ -292,11 +292,16 @@ async function initFacilitadorModules(userId) {
 async function initAdminModules(userId) {
   console.log('📦 Cargando módulos de ADMIN...');
   
-  // Cargar módulo de usuarios como módulo ES6
-  const usuariosModule = document.createElement('script');
-  usuariosModule.type = 'module';
-  usuariosModule.src = 'modules/admin/usuarios.js';
-  document.body.appendChild(usuariosModule);
+  // Cargar módulo de usuarios dinámicamente como módulo ES6
+  try {
+    const { inicializarModuloUsuarios } = await import('../modules/admin/usuarios.js');
+    // Esperar un tick para asegurar que el DOM esté completamente listo
+    setTimeout(() => {
+      inicializarModuloUsuarios();
+    }, 100);
+  } catch (err) {
+    console.error('❌ Error cargando módulo usuarios:', err);
+  }
 
   const contenidoModule = document.createElement('script');
   contenidoModule.src = 'modules/admin/contenido.js';
