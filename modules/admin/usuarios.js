@@ -1,115 +1,107 @@
 /**
- * modules/admin/usuarios.js
+ * usuarios.js
  *
- * Módulo para gestión de usuarios (administrador).
+ * Módulo orquestador para gestión de usuarios.
  * Responsabilidades:
- * - Listar todos los usuarios del sistema
- * - Permitir crear, editar y eliminar usuarios
- * - Filtrar por rol
- * - Buscar usuarios
+ * - Inicializar el módulo cuando el dashboard carga
+ * - Obtener datos de Supabase
+ * - Coordinar entre UI y API
+ * - Manejar errores globales
+ * - Actualizar estadísticas
+ * 
+ * Nota: Este módulo carga las APIs y UI como módulos ES6 dinámicamente
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+/**
+ * Actualizar estadísticas del panel admin
+ * @param {Array} perfiles - Array de todos los perfiles
+ */
+function actualizarEstadisticas(perfiles) {
+  const totalUsers = document.getElementById('totalUsers');
+  const activeStudents = document.getElementById('activeStudents');
+  const trainers = document.getElementById('trainers');
+  const monitors = document.getElementById('monitors');
 
-  // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    console.error('❌ Error obteniendo usuario en módulo usuarios');
-    return;
-  }
+  if (totalUsers) totalUsers.textContent = perfiles.length;
+  if (activeStudents)
+    activeStudents.textContent = perfiles.filter((u) => u.rol === 'estudiante').length;
+  if (trainers)
+    trainers.textContent = perfiles.filter((u) => u.rol === 'facilitador').length;
+  if (monitors)
+    monitors.textContent = perfiles.filter((u) => u.rol === 'monitor').length;
+}
 
+/**
+ * Mostrar mensaje de carga
+ */
+function mostrarCargando() {
   const usersList = document.getElementById('usersList');
-  const addUserBtn = document.getElementById('addUserBtn');
-  const userSearch = document.getElementById('userSearch');
-  const roleFilter = document.getElementById('roleFilter');
-
-  console.log('👨‍💼 Módulo de USUARIOS inicializado');
-
-  if (!usersList) {
-    console.warn('⚠️ Elemento #usersList no encontrado');
-    return;
+  if (usersList) {
+    usersList.innerHTML = '<p class="loading">Cargando usuarios...</p>';
   }
+}
 
-  // ============================================================
-  // CARGAR LISTA DE USUARIOS
-  // ============================================================
-  async function loadUsers() {
-    try {
-      const { data: usuarios, error } = await supabase
-        .from('perfiles')
-        .select('id, nombre, email, rol')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (!usuarios || usuarios.length === 0) {
-        usersList.innerHTML = '<p>No hay usuarios registrados.</p>';
-        return;
-      }
-
-      // Actualizar estadísticas
-      updateStats(usuarios);
-
-      // Renderizar lista
-      usersList.innerHTML = usuarios
-        .map(user => `
-          <div class="user-item">
-            <div class="user-info">
-              <strong>${user.nombre}</strong>
-              <small>${user.email}</small>
-              <span class="role-badge">${user.rol}</span>
-            </div>
-            <div class="user-actions">
-              <button class="btn-secondary" data-user-id="${user.id}">Editar</button>
-              <button class="btn-danger" data-user-id="${user.id}">Eliminar</button>
-            </div>
-          </div>
-        `)
-        .join('');
-    } catch (err) {
-      console.error('❌ Error cargando usuarios:', err);
-      usersList.innerHTML = '<p>Error al cargar usuarios.</p>';
-    }
+/**
+ * Mostrar mensaje de error
+ * @param {string} mensaje - Mensaje de error
+ */
+function mostrarError(mensaje) {
+  const usersList = document.getElementById('usersList');
+  if (usersList) {
+    usersList.innerHTML = `
+      <div class="error-message">
+        <p>❌ ${mensaje}</p>
+        <button onclick="location.reload()" class="btn-secondary">Reintentar</button>
+      </div>
+    `;
   }
+}
 
-  // ============================================================
-  // ACTUALIZAR ESTADÍSTICAS
-  // ============================================================
-  function updateStats(usuarios) {
-    const totalUsers = document.getElementById('totalUsers');
-    const activeStudents = document.getElementById('activeStudents');
-    const trainers = document.getElementById('trainers');
-    const monitors = document.getElementById('monitors');
+/**
+ * Inicializar el módulo de usuarios
+ * Se ejecuta cuando dashboard carga el rol admin
+ */
+async function inicializarModuloUsuarios() {
+  console.log('📦 Inicializando módulo de usuarios admin...');
 
-    if (totalUsers) totalUsers.textContent = usuarios.length;
-    if (activeStudents) activeStudents.textContent = usuarios.filter(u => u.rol === 'estudiante').length;
-    if (trainers) trainers.textContent = usuarios.filter(u => u.rol === 'facilitador').length;
-    if (monitors) monitors.textContent = usuarios.filter(u => u.rol === 'monitor').length;
+  try {
+    // Mostrar estado de carga
+    mostrarCargando();
+
+    // Cargar módulos dinámicamente
+    const { obtenerPerfiles } = await import('./usuarios.api.js');
+    const {
+      renderizarTablaUsuarios,
+      inicializarControles,
+    } = await import('./usuarios.ui.js');
+
+    // Obtener perfiles de Supabase
+    const perfiles = await obtenerPerfiles();
+    console.log(`✅ Se obtuvieron ${perfiles.length} usuarios`);
+
+    // Actualizar estadísticas
+    actualizarEstadisticas(perfiles);
+
+    // Renderizar tabla inicial
+    renderizarTablaUsuarios(perfiles);
+
+    // Inicializar controles de búsqueda y filtrado
+    inicializarControles(perfiles);
+
+    console.log('✅ Módulo de usuarios inicializado correctamente');
+  } catch (err) {
+    console.error('❌ Error inicializando módulo de usuarios:', err);
+    mostrarError('No se pudieron cargar los usuarios. Intenta nuevamente.');
   }
+}
 
-  // Listener para agregar usuario
-  if (addUserBtn) {
-    addUserBtn.addEventListener('click', () => {
-      alert('Función "Agregar usuario" en desarrollo');
-    });
+// Esperar a que el DOM esté listo y ejecutar inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  // Verificar que existe el contenedor de usuarios
+  const usersList = document.getElementById('usersList');
+  if (usersList) {
+    inicializarModuloUsuarios();
+  } else {
+    console.warn('⚠️ No se encontró #usersList. El módulo no se inicializará.');
   }
-
-  // Listener para búsqueda
-  if (userSearch) {
-    userSearch.addEventListener('input', () => {
-      // Implementar filtrado en tiempo real
-      loadUsers();
-    });
-  }
-
-  // Listener para filtro de rol
-  if (roleFilter) {
-    roleFilter.addEventListener('change', () => {
-      loadUsers();
-    });
-  }
-
-  // Cargar usuarios al inicializar
-  await loadUsers();
 });

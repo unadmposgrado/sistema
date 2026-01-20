@@ -291,7 +291,10 @@ async function initFacilitadorModules(userId) {
 
 async function initAdminModules(userId) {
   console.log('📦 Cargando módulos de ADMIN...');
+  
+  // Cargar módulo de usuarios como módulo ES6
   const usuariosModule = document.createElement('script');
+  usuariosModule.type = 'module';
   usuariosModule.src = 'modules/admin/usuarios.js';
   document.body.appendChild(usuariosModule);
 
