@@ -83,7 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (profileError) {
         console.error('❌ Error al crear/actualizar perfil:', profileError);
-        alert('Aviso: El usuario fue registrado pero hubo un error al guardar el perfil. Por favor contacta al administrador.');
+        
+        // Si es error de foreign key (23503), mostrar mensaje de email duplicado
+        if (profileError.code === '23503') {
+          throw new Error('Este correo ya está registrado. Si ya tienes una cuenta, inicia sesión.');
+        }
+        
         throw profileError;
       }
 
