@@ -46,10 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      if (error) throw error;
+      // Validación defensiva: Detectar email ya registrado o error en signUp
+      if (error) {
+        if (
+          error.message?.toLowerCase().includes('already') ||
+          error.message?.toLowerCase().includes('registered')
+        ) {
+          throw new Error('Este correo ya está registrado. Si ya tienes una cuenta, inicia sesión.');
+        } else {
+          throw error;
+        }
+      }
 
-      // Paso 2: Validación defensiva de data.user
-      if (!data.user || !data.user.id) {
+      // Validación defensiva: Verificar que data.user existe
+      if (!data || !data.user) {
+        throw new Error('Este correo ya está registrado. Si ya tienes una cuenta, inicia sesión.');
+      }
+
+      if (!data.user.id) {
         throw new Error('❌ Error crítico: No se pudo obtener el ID del usuario registrado.');
       }
 
@@ -86,9 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('❌ Error al registrar usuario:', err);
 
-      let message = 'Ocurrió un error al registrar.';
-      if (err.message?.includes('User already registered')) {
-        message = 'Este correo ya está registrado.';
+      let message = 'Ocurrió un error al registrar. Intenta más tarde.';
+      if (err.message?.includes('Este correo ya está registrado')) {
+        message = err.message;
+      } else if (err.message?.toLowerCase().includes('user already registered')) {
+        message = 'Este correo ya está registrado. Si ya tienes una cuenta, inicia sesión.';
       }
 
       alert(message);
