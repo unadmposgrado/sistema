@@ -572,3 +572,18 @@ label {
   font-size: var(--font-size-lg);
   color: var(--text-light);
 }
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer {
+  background-color: #4f4e4e;
+  color: #ffffff;
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+  margin-top: var(--spacing-xxl);
+  font-size: var(--font-size-sm);
+}
+
+.footer p {
+  margin: 0;
+}

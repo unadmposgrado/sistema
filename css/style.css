@@ -170,3 +170,17 @@ main img { display: block; margin: 0; max-width: 100%; height: auto; }
 .toggle-password[aria-pressed="true"] svg { fill: #29473f; }
 .toggle-password:focus { outline: 2px solid rgba(41,71,63,0.12); border-radius: 6px; }
 
+/* Footer */
+.footer {
+  background-color: #4f4e4e;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  font-size: 14px;
+}
+
+.footer p {
+  margin: 0;
+}
+
