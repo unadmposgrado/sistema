@@ -274,6 +274,17 @@ async function initEstudianteModules(userId) {
 
 async function initFacilitadorModules(userId) {
   console.log('📦 Cargando módulos de FACILITADOR...');
+  
+  // Cargar datos del facilitador
+  const perfilModule = document.createElement('script');
+  perfilModule.src = 'modules/facilitador/perfil.js';
+  perfilModule.onload = () => {
+    if (window.cargarDatosFacilitador) {
+      window.cargarDatosFacilitador(userId);
+    }
+  };
+  document.body.appendChild(perfilModule);
+
   const gruposModule = document.createElement('script');
   gruposModule.src = 'modules/facilitador/grupos.js';
   document.body.appendChild(gruposModule);
