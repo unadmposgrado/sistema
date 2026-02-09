@@ -76,15 +76,18 @@ export async function inicializarModuloUsuarios() {
     mostrarCargando();
 
     // Cargar módulos dinámicamente
-    const { obtenerPerfiles } = await import('./usuarios.api.js');
+    const { obtenerPerfiles, ordenarPerfiles } = await import('./usuarios.api.js');
     const {
       renderizarTablaUsuarios,
       inicializarControles,
     } = await import('./usuarios.ui.js');
 
     // Obtener perfiles de Supabase
-    const perfiles = await obtenerPerfiles();
+    let perfiles = await obtenerPerfiles();
     console.log(`✅ Se obtuvieron ${perfiles.length} usuarios`);
+
+    // Aplicar ordenamiento según roles y nombre alfabético
+    perfiles = ordenarPerfiles(perfiles);
 
     // Actualizar estadísticas
     actualizarEstadisticas(perfiles);

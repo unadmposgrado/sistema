@@ -92,6 +92,30 @@ export async function resetearOnboarding(userId) {
 }
 
 /**
+ * Ordenar perfiles según rol y nombre
+ * Orden: admin, monitor, facilitador, estudiante
+ * Dentro de cada rol: orden alfabético por nombre
+ * @param {Array} perfiles - Array de perfiles a ordenar
+ * @returns {Array} Perfiles ordenados
+ */
+export function ordenarPerfiles(perfiles) {
+  const ordenRoles = { admin: 0, monitor: 1, facilitador: 2, estudiante: 3 };
+
+  return [...perfiles].sort((a, b) => {
+    const ordenA = ordenRoles[a.rol] ?? 99;
+    const ordenB = ordenRoles[b.rol] ?? 99;
+
+    // Si tienen diferente rol, ordenar por rol primero
+    if (ordenA !== ordenB) {
+      return ordenA - ordenB;
+    }
+
+    // Si tienen el mismo rol, ordenar alfabéticamente por nombre
+    return (a.nombre || '').localeCompare(b.nombre || '', 'es');
+  });
+}
+
+/**
  * Filtrar y buscar perfiles
  * @param {Array} perfiles - Array de perfiles
  * @param {string} searchTerm - Término de búsqueda (nombre o email)
@@ -115,6 +139,9 @@ export function filtrarPerfiles(perfiles, searchTerm, rolFiltro) {
   if (rolFiltro?.trim()) {
     resultado = resultado.filter((perfil) => perfil.rol === rolFiltro);
   }
+
+  // Aplicar ordenamiento
+  resultado = ordenarPerfiles(resultado);
 
   return resultado;
 }
