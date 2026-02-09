@@ -75,7 +75,7 @@
 
 .info-item {
   padding: var(--spacing-md);
-  background: var(--light-bg);
+  background: var(--white);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
