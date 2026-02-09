@@ -24,7 +24,7 @@ window.cargarDatosEstudiante = async function(userId) {
     // 2. Obtener datos de estudiante
     const { data: estudiante, error: estudianteError } = await window.supabaseClient
       .from('estudiantes')
-      .select('matricula, grado')
+      .select('matricula, grado, institucion')
       .eq('perfil_id', userId)
       .maybeSingle();
 
@@ -36,7 +36,9 @@ window.cargarDatosEstudiante = async function(userId) {
     // 3. Pintar datos SOLO si existen los elementos
     const nombreEl = document.getElementById('welcomeName');
     const matriculaEl = document.getElementById('matricula');
-    const gradoEl = document.getElementById('program');
+    const gradoEl = document.getElementById('grado');
+    const institucionEl = document.getElementById('institucion');
+    const programEl = document.getElementById('program');
 
     if (nombreEl && perfil?.nombre) {
       nombreEl.textContent = perfil.nombre;
@@ -48,6 +50,15 @@ window.cargarDatosEstudiante = async function(userId) {
 
     if (gradoEl && estudiante?.grado) {
       gradoEl.textContent = estudiante.grado;
+    }
+
+    if (institucionEl && estudiante?.institucion) {
+      institucionEl.textContent = estudiante.institucion;
+    }
+
+    // Mantener compatibilidad con el elemento anterior (program)
+    if (programEl && estudiante?.grado) {
+      programEl.textContent = estudiante.grado;
     }
 
   } catch (err) {
