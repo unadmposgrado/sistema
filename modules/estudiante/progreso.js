@@ -3,17 +3,17 @@
  *
  * Módulo para gestionar y mostrar el progreso académico del estudiante.
  * Responsabilidades:
- * - Cargar datos de progreso desde Supabase
+ * - Cargar datos de progreso de la simulación
  * - Mostrar barra de avance general
  * - Mostrar información de cursos (en progreso y concluidos)
  * - Actualizar información personal
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeStudentProgressModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo progreso');
     return;
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CARGAR DATOS DEL ESTUDIANTE
   // ============================================================
   try {
-    const { data: perfil, error: perfilError } = await supabase
+    const { data: perfil, error: perfilError } = await demoStore
       .from('perfiles')
       .select('nombre, programaEducativo, tutorAsignado, matricula')
       .eq('id', userId)
@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tutorElem = document.querySelector('.tutor');
     const matriculaElem = document.getElementById('matricula');
 
-    if (welcomeName) welcomeName.textContent = `Bienvenido, ${perfil.nombre}`;
+    if (welcomeName) welcomeName.textContent = perfil.nombre;
     if (programElem) programElem.textContent = perfil.programaEducativo || 'Por asignar';
     if (tutorElem) tutorElem.textContent = perfil.tutorAsignado || 'Por asignar';
-    if (matriculaElem) matriculaElem.textContent = perfil.matricula || '---';
+    if (matriculaElem && perfil.matricula) matriculaElem.textContent = perfil.matricula;
 
     // ============================================================
     // CARGAR PROGRESO ACADÉMICO
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const progressText = document.getElementById('progressText');
 
     if (progressBar && progressText) {
-      const progress = 0; // Reemplazar con datos de Supabase
+      const progress = 0;
       progressBar.style.width = `${progress}%`;
       progressText.textContent = `${progress}%`;
     }
@@ -79,4 +79,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('❌ Error en módulo progreso:', err);
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStudentProgressModule, { once: true });
+} else {
+  initializeStudentProgressModule();
+}

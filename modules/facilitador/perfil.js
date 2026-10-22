@@ -1,16 +1,16 @@
 /**
  * modules/facilitador/perfil.js
  * 
- * Carga y pinta datos reales del facilitador desde Supabase
+ * Carga y pinta datos locales del facilitador
  * Expone: window.cargarDatosFacilitador(userId)
  */
 
 window.cargarDatosFacilitador = async function(userId) {
-  if (!userId || !window.supabaseClient) return;
+  if (!userId || !window.demoStore) return;
 
   try {
     // 1. Obtener perfil del usuario (nombre)
-    const { data: perfil, error: perfilError } = await window.supabaseClient
+    const { data: perfil, error: perfilError } = await window.demoStore
       .from('perfiles')
       .select('nombre')
       .eq('id', userId)
@@ -22,7 +22,7 @@ window.cargarDatosFacilitador = async function(userId) {
     }
 
     // 2. Obtener datos del facilitador (área, experiencia, institución)
-    const { data: facilitador, error: facilitadorError } = await window.supabaseClient
+    const { data: facilitador, error: facilitadorError } = await window.demoStore
       .from('facilitadores')
       .select('area_expertise, experiencia, institucion')
       .eq('perfil_id', userId)

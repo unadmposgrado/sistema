@@ -17,9 +17,9 @@ export async function startOnboarding({ user, perfil }) {
   try {
     console.log('🎯 startOnboarding iniciado para usuario:', user?.id);
 
-    // Validar que Supabase esté disponible
-    if (!window.supabaseClient) {
-      console.error('❌ Supabase no disponible en window.supabaseClient');
+    // Validar que el almacenamiento local esté disponible
+    if (!window.demoStore) {
+      console.error('❌ Almacenamiento local no disponible');
       const layoutContainer = document.getElementById('layout-container');
       if (layoutContainer) {
         layoutContainer.innerHTML = '<p style="color: red;">Error: No se pudo conectar a la base de datos.</p>';
@@ -38,7 +38,7 @@ export async function startOnboarding({ user, perfil }) {
     }
 
     const userId = user.id;
-    const supabase = window.supabaseClient;
+    const demoStore = window.demoStore;
 
     // Obtener o crear perfil
     let userPerfil = perfil;
@@ -46,7 +46,7 @@ export async function startOnboarding({ user, perfil }) {
     if (!userPerfil) {
       console.log('📝 Perfil no proporcionado. Buscando en BD...');
       
-      const { data: existingPerfil, error: searchError } = await supabase
+      const { data: existingPerfil, error: searchError } = await demoStore
         .from('perfiles')
         .select('*')
         .eq('id', userId)
@@ -66,7 +66,7 @@ export async function startOnboarding({ user, perfil }) {
         // Perfil no existe, crearlo
         console.log('📝 Perfil no existe. Creando uno nuevo...');
         
-        const { data: newPerfil, error: createError } = await supabase
+        const { data: newPerfil, error: createError } = await demoStore
           .from('perfiles')
           .insert([{
             id: userId
@@ -138,7 +138,7 @@ export async function startOnboarding({ user, perfil }) {
         user,
         perfil: userPerfil,
         layoutContainer,
-        supabase
+        demoStore
       });
     } else {
       console.error('❌ El módulo no exporta renderOnboarding');
@@ -168,7 +168,7 @@ function loadOnboardingCSS() {
   const link = document.createElement('link');
   link.id = 'onboarding-css';
   link.rel = 'stylesheet';
-  link.href = './onboarding.css';
+  link.href = './modules/onboarding/onboarding.css';
   document.head.appendChild(link);
   console.log('✅ CSS de onboarding cargado');
 }

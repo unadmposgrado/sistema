@@ -6,9 +6,9 @@
  * Responsabilidades:
  * - Definir estado de roles (habilitado/deshabilitado)
  * - Proporcionador de helpers para consultar configuración
- * - Servir como base para futuras integraciones (Admin Panel, API, Supabase)
+ * - Servir como base para futuras integraciones del sistema
  * - NO contiene lógica de autenticación
- * - NO contiene llamadas a Supabase
+ * - NO contiene lógica de autenticación
  * 
  * Uso:
  *   import { isRoleEnabled, getRoleConfig, ROLES } from './config.js';
@@ -264,7 +264,7 @@ export function isFeatureEnabled(featureName) {
 
 /**
  * Cambia el estado de un rol (uso interno/admin)
- * NOTA: En el futuro, esto vendrá de una API o Supabase
+ * NOTA: La simulación actual almacena los datos en el navegador
  * 
  * @param {string} roleName - Nombre del rol
  * @param {string} newState - Nuevo estado ('active', 'disabled', 'paused')

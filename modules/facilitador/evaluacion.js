@@ -5,14 +5,14 @@
  * Responsabilidades:
  * - Cargar lista de estudiantes del grupo seleccionado
  * - Permitir calificación y retroalimentación
- * - Guardar evaluaciones en Supabase
+ * - Guardar evaluaciones de la simulación
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeFacilitatorEvaluationModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo evaluación');
     return;
@@ -37,4 +37,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('❌ Error en módulo evaluación:', err);
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeFacilitatorEvaluationModule, { once: true });
+} else {
+  initializeFacilitatorEvaluationModule();
+}

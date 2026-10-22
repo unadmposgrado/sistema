@@ -3,16 +3,16 @@
  *
  * Módulo para mostrar retroalimentación del tutor/facilitador.
  * Responsabilidades:
- * - Cargar feedback desde Supabase
+ * - Cargar feedback de la simulación
  * - Mostrar retroalimentación pendiente
  * - Mostrar historial de retroalimentación
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeStudentFeedbackModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo retroalimentación');
     return;
@@ -41,4 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('❌ Error en módulo retroalimentación:', err);
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStudentFeedbackModule, { once: true });
+} else {
+  initializeStudentFeedbackModule();
+}

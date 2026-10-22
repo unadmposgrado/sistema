@@ -8,11 +8,11 @@
  * - Permitir exportación de datos
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeFacilitatorReportsModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo reportes');
     return;
@@ -67,4 +67,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar primer tab por defecto
   loadReportContent('progress');
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeFacilitatorReportsModule, { once: true });
+} else {
+  initializeFacilitatorReportsModule();
+}

@@ -8,11 +8,11 @@
  * - Mostrar estado de validación
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeStudentEvidenceModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo evidencias');
     return;
@@ -42,4 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('❌ Error en módulo evidencias:', err);
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStudentEvidenceModule, { once: true });
+} else {
+  initializeStudentEvidenceModule();
+}

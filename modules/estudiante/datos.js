@@ -1,16 +1,16 @@
 /**
  * modules/estudiante/datos.js
  * 
- * Carga y pinta datos reales del estudiante desde Supabase
+ * Carga y pinta datos locales del estudiante
  * Expone: window.cargarDatosEstudiante(userId)
  */
 
 window.cargarDatosEstudiante = async function(userId) {
-  if (!userId || !window.supabaseClient) return;
+  if (!userId || !window.demoStore) return;
 
   try {
     // 1. Obtener perfil
-    const { data: perfil, error: perfilError } = await window.supabaseClient
+    const { data: perfil, error: perfilError } = await window.demoStore
       .from('perfiles')
       .select('nombre')
       .eq('id', userId)
@@ -22,7 +22,7 @@ window.cargarDatosEstudiante = async function(userId) {
     }
 
     // 2. Obtener datos de estudiante
-    const { data: estudiante, error: estudianteError } = await window.supabaseClient
+    const { data: estudiante, error: estudianteError } = await window.demoStore
       .from('estudiantes')
       .select('matricula, grado, institucion')
       .eq('perfil_id', userId)

@@ -24,11 +24,11 @@
       if (!useLogged) return;
 
       // 🔐 Usuario autenticado
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data: { session } } = await window.demoStore.auth.getSession();
       if (!session?.user) return;
 
       // 🎭 Obtener rol desde perfiles
-      const { data: perfil, error } = await supabaseClient
+      const { data: perfil, error } = await window.demoStore
         .from('perfiles')
         .select('rol')
         .eq('id', session.user.id)
@@ -108,7 +108,7 @@
       const logoutBtn = profileMenu.querySelector('#logoutBtn');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-          await supabaseClient.auth.signOut();
+          await window.demoStore.auth.signOut();
           window.location.href = 'index.html';
         });
       }

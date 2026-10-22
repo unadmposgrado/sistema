@@ -11,7 +11,7 @@
  * 3. Actualizar 'perfiles.onboarding_completo = true'
  */
 
-export async function renderOnboarding({ user, layoutContainer, supabase }) {
+export async function renderOnboarding({ user, layoutContainer, demoStore }) {
   try {
     // ================================
     // Validaciones mínimas
@@ -23,8 +23,8 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
       return;
     }
 
-    if (!supabase) {
-      console.error('❌ Supabase no disponible');
+    if (!demoStore) {
+      console.error('❌ Almacenamiento local no disponible');
       layoutContainer.innerHTML =
         '<p style="color:red;">Error: conexión a base de datos no disponible.</p>';
       return;
@@ -106,7 +106,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
 
       try {
         // Paso 1: Verificar si existe registro en tabla 'monitores'
-        const { data: monitorExistente, error: errorVerificacion } = await supabase
+        const { data: monitorExistente, error: errorVerificacion } = await demoStore
           .from('monitores')
           .select('perfil_id')
           .eq('perfil_id', userId)
@@ -122,7 +122,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
 
         // Paso 2: Si no existe, crear el registro en 'monitores'
         if (!monitorExistente) {
-          const { error: errorCreacion } = await supabase
+          const { error: errorCreacion } = await demoStore
             .from('monitores')
             .insert([{
               perfil_id: userId,
@@ -139,7 +139,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
           }
         } else {
           // Paso 2B: Si existe, actualizar datos en 'monitores'
-          const { error: errorActualizacion } = await supabase
+          const { error: errorActualizacion } = await demoStore
             .from('monitores')
             .update({
               interes_academico: data.interes.trim(),
@@ -157,7 +157,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
         }
 
         // Paso 3: Actualizar 'perfiles.onboarding_completo = true' (operación SEPARADA)
-        const { error: errorPerfil } = await supabase
+        const { error: errorPerfil } = await demoStore
           .from('perfiles')
           .update({ onboarding_completo: true })
           .eq('id', userId);
@@ -186,7 +186,7 @@ export async function renderOnboarding({ user, layoutContainer, supabase }) {
     // ================================
     cancelBtn.addEventListener('click', async () => {
       try {
-        await supabase.auth.signOut();
+        await demoStore.auth.signOut();
         window.location.href = 'index.html';
       } catch (err) {
         console.error('❌ Error al cerrar sesión:', err);

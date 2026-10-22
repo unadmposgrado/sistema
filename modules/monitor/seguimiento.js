@@ -3,16 +3,16 @@
  *
  * Módulo para mostrar el seguimiento del estado de solicitud del monitor.
  * Responsabilidades:
- * - Cargar información personal desde Supabase
+ * - Cargar información personal desde datos locales
  * - Mostrar estado actual de la solicitud
  * - Mostrar retroalimentación del evaluador (si disponible)
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeMonitorTrackingModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo seguimiento');
     return;
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CARGAR DATOS DEL MONITOR
   // ============================================================
   try {
-    const { data: perfil, error } = await supabase
+    const { data: perfil, error } = await demoStore
       .from('perfiles')
       .select('nombre, institucion, interes_academico')
       .eq('id', userId)
@@ -63,4 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('❌ Error en módulo seguimiento:', err);
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeMonitorTrackingModule, { once: true });
+} else {
+  initializeMonitorTrackingModule();
+}

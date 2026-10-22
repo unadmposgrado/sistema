@@ -4,7 +4,7 @@
  * Orquestador central del dashboard.
  * Responsabilidades:
  * - Validar sesión del usuario
- * - Detectar rol desde Supabase (perfiles.rol)
+ * - Detectar el rol desde los perfiles guardados localmente
  * - Validar estado del rol en config.js
  * - Cargar dinámicamente el layout correspondiente desde /layouts/
  * - Inicializar módulos JavaScript específicos del rol
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     // 1. VALIDAR SESIÓN
     // ============================================================
-    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    const { data: { session } } = await window.demoStore.auth.getSession();
     if (!session?.user) {
       console.warn('❌ No hay sesión activa. Redirigiendo a login.');
       window.location.href = 'login.html';
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================================
     // 2. OBTENER PERFIL DEL USUARIO
     // ============================================================
-    const { data: perfil, error: perfilError } = await window.supabaseClient
+    const { data: perfil, error: perfilError } = await window.demoStore
       .from('perfiles')
       .select('id, rol, onboarding_completo') // <--- CORRECCIÓN: incluir id
       .eq('id', userId)
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-          await window.supabaseClient.auth.signOut();
+          await window.demoStore.auth.signOut();
           localStorage.removeItem('user');
           window.location.href = 'index.html';
         } catch (err) {

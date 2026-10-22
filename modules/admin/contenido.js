@@ -8,11 +8,11 @@
  * - Gestionar módulos y temas
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeAdminContentModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo contenido');
     return;
@@ -75,4 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar primer tab por defecto
   await loadContentTab('programs');
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeAdminContentModule, { once: true });
+} else {
+  initializeAdminContentModule();
+}

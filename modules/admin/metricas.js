@@ -8,11 +8,11 @@
  * - Permitir exportación de datos
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeAdminMetricsModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo métricas');
     return;
@@ -61,4 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar métricas iniciales
   await loadMetrics('month');
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeAdminMetricsModule, { once: true });
+} else {
+  initializeAdminMetricsModule();
+}

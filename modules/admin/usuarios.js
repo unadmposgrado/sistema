@@ -4,7 +4,7 @@
  * Módulo orquestador para gestión de usuarios.
  * Responsabilidades:
  * - Inicializar el módulo cuando el dashboard carga
- * - Obtener datos de Supabase
+ * - Obtener perfiles del almacenamiento local
  * - Coordinar entre UI y API
  * - Manejar errores globales
  * - Actualizar estadísticas
@@ -82,7 +82,7 @@ export async function inicializarModuloUsuarios() {
       inicializarControles,
     } = await import('./usuarios.ui.js');
 
-    // Obtener perfiles de Supabase
+    // Obtener perfiles locales
     let perfiles = await obtenerPerfiles();
     console.log(`✅ Se obtuvieron ${perfiles.length} usuarios`);
 

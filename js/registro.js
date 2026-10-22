@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.textContent = 'Registrando...';
 
     try {
-      // Paso 1: Registrar usuario en Supabase Auth
-      const { data, error } = await supabaseClient.auth.signUp({
+      const { data, error } = await window.demoStore.auth.signUp({
         email,
         password,
         options: {
@@ -67,9 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('❌ Error crítico: No se pudo obtener el ID del usuario registrado.');
       }
 
-      // Paso 3: Crear/actualizar perfil en tabla 'perfiles' usando upsert()
+      // Crear el perfil inicial en el almacenamiento local.
       const userId = data.user.id;
-      const { error: profileError } = await supabaseClient
+      const { error: profileError } = await window.demoStore
         .from('perfiles')
         .upsert([
           {
@@ -84,19 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (profileError) {
         console.error('❌ Error al crear/actualizar perfil:', profileError);
         
-        // Si es error de foreign key (23503), mostrar mensaje de email duplicado
-        if (profileError.code === '23503') {
-          throw new Error('Este correo ya está registrado. Si ya tienes una cuenta, inicia sesión.');
-        }
-        
         throw profileError;
       }
 
       alert(
-        'Registro exitoso.\n\n' +
-        '1️⃣ Revisa tu correo para confirmar tu cuenta.\n' +
-        '2️⃣ Luego inicia sesión.\n' +
-        '3️⃣ Completa tu perfil en el primer acceso.'
+        'Registro de simulación exitoso.\n\n' +
+        'Inicia sesión con el correo y la contraseña que acabas de crear. ' +
+        'Completarás tu perfil en el primer acceso.'
       );
 
       form.reset();

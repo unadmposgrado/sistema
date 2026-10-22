@@ -4,15 +4,15 @@
  * Módulo para gestión de documentos del monitor.
  * Responsabilidades:
  * - Cargar documentos previamente subidos
- * - Gestionar subida de nuevos documentos a Supabase Storage
+ * - Gestionar documentos en almacenamiento local del navegador
  * - Mostrar estado de validación de documentos
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const supabase = window.supabaseClient;
+const initializeMonitorDocumentsModule = async () => {
+  const demoStore = window.demoStore;
 
   // Obtener usuario actual
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await demoStore.auth.getUser();
   if (userError || !user) {
     console.error('❌ Error obteniendo usuario en módulo documentos');
     return;
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================================
   async function loadUploadedFiles() {
     try {
-      const { data: files, error } = await supabase
+      const { data: files, error } = await demoStore
         .storage
         .from('monitores')
         .list(userId);
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================================
   async function downloadFile(filename, userId) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await demoStore
         .storage
         .from('monitores')
         .download(`${userId}/${filename}`);
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       uploadBtn.textContent = 'Subiendo...';
 
       try {
-        const { error: uploadError } = await supabase
+        const { error: uploadError } = await demoStore
           .storage
           .from('monitores')
           .upload(filePath, file, { upsert: true });
@@ -164,4 +164,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar archivos al inicializar
   await loadUploadedFiles();
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeMonitorDocumentsModule, { once: true });
+} else {
+  initializeMonitorDocumentsModule();
+}

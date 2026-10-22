@@ -3,12 +3,12 @@
  *
  * Capa de datos para gestión de usuarios.
  * Responsabilidades:
- * - Consultar tabla perfiles en Supabase
+ * - Consultar perfiles guardados en el navegador
  * - Actualizar rol y onboarding_completo
- * - Manejar errores de Supabase
+ * - Manejar errores del almacenamiento local
  */
 
-const supabaseClient = window.supabaseClient;
+const demoStore = window.demoStore;
 
 /**
  * Obtener todos los perfiles de usuarios
@@ -16,7 +16,7 @@ const supabaseClient = window.supabaseClient;
  */
 export async function obtenerPerfiles() {
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await demoStore
       .from('perfiles')
       .select('id, nombre, email, rol, onboarding_completo')
       .order('nombre', { ascending: true });
@@ -42,7 +42,7 @@ export async function obtenerPerfiles() {
  */
 export async function cambiarRol(userId, nuevoRol) {
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await demoStore
       .from('perfiles')
       .update({
         rol: nuevoRol,
@@ -71,7 +71,7 @@ export async function cambiarRol(userId, nuevoRol) {
  */
 export async function resetearOnboarding(userId) {
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await demoStore
       .from('perfiles')
       .update({
         onboarding_completo: false,
